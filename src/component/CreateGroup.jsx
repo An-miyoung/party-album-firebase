@@ -3,6 +3,9 @@ import styled from "styled-components";
 import GroupDetailsModal from "../component/modal/GroupDetailsModal";
 import { useRecoilState } from "recoil";
 import { groupNameState } from "../store/groupName";
+import { db } from "../firebase";
+import { set, ref } from "firebase/database";
+import { uid } from "uid";
 
 const CreateGroup = () => {
   const [showGroupDetailsModal, setShowGroupDetailsModal] = useState(false);
@@ -15,6 +18,14 @@ const CreateGroup = () => {
   const handleCreateGroup = useCallback(() => {
     setShowGroupDetailsModal(true);
   }, []);
+
+  const writeToDatabase = useCallback(() => {
+    const guid = uid();
+    set(ref(db, "groups/" + guid), {
+      groupId: guid,
+      groupName,
+    });
+  }, [groupName]);
 
   return (
     <StyleButtonContainer>
@@ -31,6 +42,7 @@ const CreateGroup = () => {
           name="groupName"
           inputValue={groupName}
           setInputValue={setGroupName}
+          handleCreate={writeToDatabase}
         />
       </StyleButtonContainer>
     </StyleButtonContainer>

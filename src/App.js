@@ -1,23 +1,19 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import { Route, Routes, Navigate } from "react-router-dom";
+import { ROUTES } from "./routes.js";
+import AddMembers from "./pages/AddMembers";
+import Join from "./pages/Join";
+import GroupsList from "./pages/GroupsList";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Routes>
+        <Route path="/" element={<Navigate to={ROUTES.JOIN} />} />
+        <Route path={ROUTES.JOIN} element={<Join />} />
+        <Route path={ROUTES.ADD_MEMBERS} element={<AddMembers />} />
+        <Route path={ROUTES.GROUPS_LIST} element={<GroupsList />} />
+      </Routes>
     </div>
   );
 }

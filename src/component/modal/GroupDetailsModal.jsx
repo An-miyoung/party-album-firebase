@@ -14,6 +14,7 @@ const GroupDetailsModal = ({
   name,
   inputValue,
   setInputValue,
+  handleCreate,
 }) => {
   const closeModal = useCallback(() => {
     setInputValue("");
@@ -22,11 +23,12 @@ const GroupDetailsModal = ({
 
   const handleInputComplete = useCallback(() => {
     if (inputValue.length > 0) {
+      handleCreate();
       handleClose();
     } else {
       alert("내용이 입력되지 않았습니다. 다시 시도해 주세요.");
     }
-  }, [handleClose, inputValue.length]);
+  }, [handleClose, handleCreate, inputValue.length]);
 
   const handleChange = (e) => {
     setInputValue(e.target.value);
