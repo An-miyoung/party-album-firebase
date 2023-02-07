@@ -1,21 +1,42 @@
-import React from "react";
+import React, { useState, useCallback, useEffect } from "react";
+import { db } from "../firebase";
+import { ref, onValue, get, child, set } from "firebase/database";
 import styled from "styled-components";
 import Header from "../component/Header";
 import CreateGroup from "../component/CreateGroup";
 
 const GroupsList = () => {
-  const groupNames = [
-    "오케이 골프",
-    "창덕맘 모임",
-    "유교과 대왕대비",
-    "AAAA",
-    "BBBBBB",
-    "CCC",
-    "DDD",
-    "EEE",
-    "FFF",
-    "GGG",
-  ];
+  const [groupNames, setGroupNames] = useState([]);
+
+  const groupNameRef = ref(db, "groups/");
+  // useEffect(() => {
+  //   get(child(groupNameRef, "groups/"))
+  //     .then((snapshot) => {
+  //       if (snapshot.exists()) {
+  //         const data = Object.values(snapshot.val());
+  //         data.map((item) => {
+  //           return setGroupNameList((prev) => [...prev, item.groupName]);
+  //         });
+  //         console.log(groupNameList);
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+  // }, [groupNameList, groupNameRef, groupNames]);
+
+  useEffect(() => {
+    onValue(groupNameRef, (snapshot) => {
+      console.log(snapshot.val());
+      const data = Object.values(snapshot.val());
+      const groupNameList = [];
+      data.map((item) => groupNameList.push(item.groupName));
+      setGroupNames(groupNameList);
+      return groupNames;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <StyleContainer>
       <Header />

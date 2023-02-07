@@ -4,7 +4,7 @@ import GroupDetailsModal from "../component/modal/GroupDetailsModal";
 import { useRecoilState } from "recoil";
 import { groupNameState } from "../store/groupName";
 import { db } from "../firebase";
-import { set, ref } from "firebase/database";
+import { set, ref, serverTimestamp } from "firebase/database";
 import { uid } from "uid";
 
 const CreateGroup = () => {
@@ -22,6 +22,7 @@ const CreateGroup = () => {
   const writeToDatabase = useCallback(() => {
     const guid = uid();
     set(ref(db, "groups/" + guid), {
+      timestamp: serverTimestamp(),
       groupId: guid,
       groupName,
     });
@@ -99,10 +100,3 @@ const StyleButton = styled.button`
     font-size: 5vw;
   }
 `;
-
-// const StyleContainer = styled.div`
-//   padding-top: 80px;
-//   padding-left: 5vw;
-//   max-width: 70vw;
-//   height: 100vh;
-// `;
