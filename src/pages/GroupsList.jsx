@@ -1,39 +1,26 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { Link } from "react-router-dom";
 import { db } from "../firebase";
-import { ref, onValue, get, child, set } from "firebase/database";
+import { ref, onValue } from "firebase/database";
 import styled from "styled-components";
 import Header from "../component/Header";
 import CreateGroup from "../component/CreateGroup";
+import { ROUTE_UTILS } from "../routes";
 
 const GroupsList = () => {
-  const [groupNames, setGroupNames] = useState([]);
-
+  const [groupData, setGroupData] = useState([]);
   const groupNameRef = ref(db, "groups/");
-  // useEffect(() => {
-  //   get(child(groupNameRef, "groups/"))
-  //     .then((snapshot) => {
-  //       if (snapshot.exists()) {
-  //         const data = Object.values(snapshot.val());
-  //         data.map((item) => {
-  //           return setGroupNameList((prev) => [...prev, item.groupName]);
-  //         });
-  //         console.log(groupNameList);
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  // }, [groupNameList, groupNameRef, groupNames]);
+
+  const readGroupData = useCallback(() => {
+    onValue(groupNameRef, (snapshot) => {
+      const data = Object.values(snapshot.val());
+      data.map((item) => setGroupData((prev) => [...prev, item]));
+      console.log(data);
+    });
+  }, [groupNameRef]);
 
   useEffect(() => {
-    onValue(groupNameRef, (snapshot) => {
-      console.log(snapshot.val());
-      const data = Object.values(snapshot.val());
-      const groupNameList = [];
-      data.map((item) => groupNameList.push(item.groupName));
-      setGroupNames(groupNameList);
-      return groupNames;
-    });
+    readGroupData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -42,9 +29,17 @@ const GroupsList = () => {
       <Header />
       <CreateGroup />
       <StyleCardContainer>
-        {groupNames.length > 0 &&
-          groupNames.map((item, idx) => (
-            <StyleCardItem key={`${item}-${idx}`}>{item}</StyleCardItem>
+        {console.log(JSON.stringify(groupData))}
+        {groupData.length > 0 &&
+          groupData.map(({ groupId, groupName }, idx) => (
+            <StyleCardItem key={`${groupId}-${idx}`}>
+              <Link
+                to={ROUTE_UTILS.SHOW_POST_DETAIL(groupId)}
+                style={{ textDecoration: "none", color: "#9c27b0" }}
+              >
+                {groupName}
+              </Link>
+            </StyleCardItem>
           ))}
       </StyleCardContainer>
     </StyleContainer>
@@ -59,10 +54,10 @@ const StyleCardContainer = styled.div`
   grid-gap: 15vw;
   padding-left: 8vw;
   padding-top: 10vh;
+  padding-bottom: 25px;
 `;
 
 const StyleCardItem = styled.div`
-  min-height: 20vh;
   min-width: 30vw;
   background-color: #ffffcc;
   filter: drop-shadow(0px 4px 4px rgb(0, 0, 0, 0.25));
@@ -75,6 +70,7 @@ const StyleCardItem = styled.div`
   overflow-wrap: break-word;
   word-break: keep-all;
   box-sizing: border-box;
+  cursor: pointer;
 
   @media screen and (max-width: 500px) {
     font-size: 4vw;
