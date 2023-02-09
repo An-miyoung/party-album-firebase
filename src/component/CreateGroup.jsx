@@ -61,7 +61,7 @@ const StyleInfoText = styled.div`
   position: fixed;
   left: 5vw;
   top: 80px;
-  color: #9c27b0;
+  color: #31383f;
 
   @media screen and (max-width: 500px) {
     height: 40px;
@@ -81,7 +81,7 @@ const StyleButton = styled.button`
   height: 8vh;
   margin: 0 auto;
   padding: 0 10px;
-  background-color: #9c27b0;
+  background-color: #31383f;
   border-radius: 8px;
   border: none;
   color: whitesmoke;

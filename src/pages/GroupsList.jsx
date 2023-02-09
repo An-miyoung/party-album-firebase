@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { db } from "../firebase";
 import { ref, onValue } from "firebase/database";
@@ -23,7 +23,6 @@ const GroupsList = () => {
 
   useEffect(() => {
     readGroupData();
-    console.log(groupData);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -32,13 +31,12 @@ const GroupsList = () => {
       <Header />
       <CreateGroup />
       <StyleCardContainer>
-        {console.log(JSON.stringify(groupData))}
         {groupData.length > 0 &&
           groupData.map(({ groupId, groupName }, idx) => (
             <StyleCardItem key={`${groupId}-${idx}`}>
               <Link
                 to={ROUTE_UTILS.SHOW_POST_DETAIL(groupId)}
-                style={{ textDecoration: "none", color: "#9c27b0" }}
+                style={{ textDecoration: "none", color: "white" }}
               >
                 {groupName}
               </Link>
@@ -58,11 +56,12 @@ const StyleCardContainer = styled.div`
   padding-left: 8vw;
   padding-top: 10vh;
   padding-bottom: 25px;
+  max-width: 70vw;
 `;
 
 const StyleCardItem = styled.div`
   min-width: 30vw;
-  background-color: #ffffcc;
+  background-color: #dd8ea4;
   filter: drop-shadow(0px 4px 4px rgb(0, 0, 0, 0.25));
   border-radius: 8px;
   padding: 20px;
@@ -84,6 +83,5 @@ const StyleCardItem = styled.div`
 const StyleContainer = styled.div`
   padding-top: 80px;
   padding-left: 5vw;
-  max-width: 70vw;
-  height: 100vh;
+  background-color: #f7f1f0;
 `;

@@ -37,8 +37,8 @@ function Header() {
       <AppBar
         position="fixed"
         sx={{
-          color: "#333333",
-          backgroundColor: "#ccccff",
+          color: "#403234",
+          backgroundColor: "#f2e9eb",
         }}
       >
         <Toolbar
@@ -59,7 +59,7 @@ function Header() {
                 미영
               </Typography>
               <Avatar
-                sx={{ ml: "10px", bgcolor: "secondary.main" }}
+                sx={{ ml: "10px", bgcolor: "#dd82a4" }}
                 alt="ProfileImage"
               ></Avatar>
             </IconButton>
