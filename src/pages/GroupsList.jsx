@@ -6,21 +6,24 @@ import styled from "styled-components";
 import Header from "../component/Header";
 import CreateGroup from "../component/CreateGroup";
 import { ROUTE_UTILS } from "../routes";
+import { useRecoilState } from "recoil";
+import { groupDataState } from "../store/groupData";
 
 const GroupsList = () => {
-  const [groupData, setGroupData] = useState([]);
+  const [groupData, setGroupData] = useRecoilState(groupDataState);
   const groupNameRef = ref(db, "groups/");
 
   const readGroupData = useCallback(() => {
     onValue(groupNameRef, (snapshot) => {
+      setGroupData([]);
       const data = Object.values(snapshot.val());
       data.map((item) => setGroupData((prev) => [...prev, item]));
-      console.log(data);
     });
-  }, [groupNameRef]);
+  }, [groupNameRef, setGroupData]);
 
   useEffect(() => {
     readGroupData();
+    console.log(groupData);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
