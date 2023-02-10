@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import {
   Button,
   Dialog,
@@ -16,6 +16,8 @@ const GroupDetailsModal = ({
   setInputValue,
   handleCreate,
 }) => {
+  const [memberString, setMembersString] = useState("");
+
   const closeModal = useCallback(() => {
     setInputValue("");
     handleClose();
@@ -25,13 +27,29 @@ const GroupDetailsModal = ({
     if (inputValue.length > 0) {
       handleCreate();
       handleClose();
+    } else if (memberString.length > 0) {
+      console.log(memberString.trim().split(","));
+      setInputValue(memberString.trim().split(","));
+      handleCreate();
+      handleClose();
     } else {
       alert("내용이 입력되지 않았습니다. 다시 시도해 주세요.");
     }
-  }, [handleClose, handleCreate, inputValue.length]);
+  }, [
+    handleClose,
+    handleCreate,
+    inputValue.length,
+    memberString,
+    setInputValue,
+  ]);
 
-  const handleChange = (e) => {
+  const handleNameChange = (e) => {
     setInputValue(e.target.value);
+  };
+
+  const handleMemberChange = (e) => {
+    console.log(e.target.value);
+    setMembersString(e.target.value);
   };
 
   return (
@@ -44,7 +62,7 @@ const GroupDetailsModal = ({
               type="text"
               placeholder="그룹이름"
               fullWidth
-              onChange={handleChange}
+              onChange={handleNameChange}
             />
           </DialogContent>
         </>
@@ -56,7 +74,7 @@ const GroupDetailsModal = ({
               type="text"
               placeholder="멤버이름"
               fullWidth
-              onChange={handleChange}
+              onChange={handleMemberChange}
             />
           </DialogContent>
         </>

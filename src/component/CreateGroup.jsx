@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import styled from "styled-components";
-import GroupDetailsModal from "../component/modal/GroupDetailsModal";
+import GroupDetailsModal from "./modal/GroupDetailsModal";
 import { useRecoilState } from "recoil";
 import { groupNameState } from "../store/groupName";
 import { db } from "../firebase";

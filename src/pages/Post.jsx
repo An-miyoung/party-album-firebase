@@ -1,31 +1,35 @@
 import React, { useCallback, useState } from "react";
 import styled from "styled-components";
+import { db } from "../firebase";
+import { ref, serverTimestamp, update } from "firebase/database";
 import { Box, Button, Menu, MenuItem, Typography } from "@mui/material";
 import { ImageList, ImageListItem, ImageListItemBar } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useParams } from "react-router-dom";
 import { useRecoilValue, useRecoilState } from "recoil";
-import { serverTimestamp } from "firebase/database";
 import Header from "../component/Header";
 import { groupDataPicker } from "../store/groupData";
 import GreenPasta from "../static/image/green-pasta.jpeg";
 import WhitePasta from "../static/image/white-pasta.jpeg";
 import Gnoggi from "../static/image/gnoggi.jpeg";
 import Signin from "../static/image/bg_signin.png";
-
-// import GroupDetailsModal from "../component/modal/GroupDetailsModal";
-// import { groupMembersState } from "../store/groupName";
-// import { db } from "../firebase";
-// import { set, ref, serverTimestamp, update } from "firebase/database";
+import GroupDetailsModal from "../component/modal/GroupDetailsModal";
+import { groupMembersState } from "../store/groupMembers";
 
 const Post = () => {
   const { guid } = useParams();
   const [anchorEl, setAnchorEl] = useState(null);
-  const [showProfileModal, setShowProfileModal] = useState(false);
   const isMobile = useMediaQuery("(max-width: 600px)");
   const pickedGroupData = useRecoilValue(groupDataPicker(guid));
-  const { groupId, groupName, timestamp } = pickedGroupData[0];
+  const { groupId, groupName, timestamp, groupMembers } = pickedGroupData[0];
+  // const hasGroupMembers =
+  //   groupMembers !== undefined &&
+  //   groupMembers !== null &&
+  //   groupMembers.length > 0;
+
+  const [showAddMembersModal, setShowAddMembersModal] = useState(false);
+  const [members, setMembers] = useRecoilState(groupMembersState);
 
   const itemData = [
     {
@@ -57,28 +61,21 @@ const Post = () => {
     setAnchorEl(null);
   }, []);
 
-  const handleProfileModalOpen = useCallback(() => {
-    setShowProfileModal(true);
+  const handleAddMembersModalOpen = useCallback(() => {
+    setShowAddMembersModal(true);
     handleCloseMenu();
   }, [handleCloseMenu]);
 
-  // const AddMembers = ()=>{
-  //   const [showGroupDetailsModal, setShowGroupDetailsModal] = useState(false);
-  //   const [members, setMembers] = useRecoilState(groupMembersState);
+  const handleShowAddMembersModal = useCallback(() => {
+    setShowAddMembersModal(false);
+  }, []);
 
-  //   const handleShowGroupDetailsModal = useCallback(() => {
-  //     setShowGroupDetailsModal(false);
-  //   }, []);
+  const writeToDatabase = useCallback(async () => {
+    const updates = {};
+    updates["/groups/" + guid + "/groupMembers"] = members;
+    await update(ref(db), updates);
+  }, [guid, members]);
 
-  //   const handleCreateGroup = useCallback(() => {
-  //     setShowGroupDetailsModal(true);
-  //   }, []);
-
-  //   const writeToDatabase = useCallback(() => {
-  //     const updates = {};
-  //     updates["/groups/"+guid+"/groupMembers"] = gorupMembers
-  //   }, [groupMembers]);
-  // }
   return (
     <StyleContainer>
       <Header />
@@ -104,7 +101,7 @@ const Post = () => {
           onClose={handleCloseMenu}
           anchorOrigin={{ vertical: "top", horizontal: "right" }}
         >
-          <MenuItem onClick={handleProfileModalOpen}>
+          <MenuItem onClick={handleAddMembersModalOpen}>
             <Typography textAlign="center">멤버추가</Typography>
           </MenuItem>
           <MenuItem>
@@ -162,6 +159,14 @@ const Post = () => {
           </ImageList>
         </>
       )}
+      <GroupDetailsModal
+        open={showAddMembersModal}
+        handleClose={handleShowAddMembersModal}
+        name="groupMembers"
+        inputValue={members}
+        setInputValue={setMembers}
+        handleCreate={writeToDatabase}
+      />
     </StyleContainer>
   );
 };

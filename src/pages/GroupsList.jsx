@@ -43,28 +43,6 @@ const GroupsList = () => {
               </Link>
             </StyleCardItem>
           ))}
-        {/* {groupData.length > 0 &&
-          groupData.map(({ groupId, groupName, members }, idx) =>
-            members !== undefined && members !== null && members.length > 0 ? (
-              <StyleCardItem key={`${groupId}-${idx}`}>
-                <Link
-                  to={ROUTE_UTILS.SHOW_POST_DETAIL(groupId)}
-                  style={{ textDecoration: "none", color: "white" }}
-                >
-                  {groupName}
-                </Link>
-              </StyleCardItem>
-            ) : (
-              <StyleCardItem key={`${groupId}-${idx}`}>
-                <Link
-                  to={ROUTE_UTILS.ADD_MEMBERS(groupId)}
-                  style={{ textDecoration: "none", color: "white" }}
-                >
-                  {groupName}
-                </Link>
-              </StyleCardItem>
-            )
-          )} */}
       </StyleCardContainer>
     </StyleContainer>
   );
