@@ -6,8 +6,8 @@ import { groupDataState } from "../store/groupData";
 
 export const ReadGroupData = () => {
   const [groupData, setGroupData] = useRecoilState(groupDataState);
-  const groupNameRef = ref(db, "groups/");
-  onValue(groupNameRef, (snapshot) => {
+  const groupsRef = ref(db, "groups/");
+  onValue(groupsRef, (snapshot) => {
     const data = Object.values(snapshot.val());
     data.map((item) => setGroupData((prev) => [...prev, item]));
     console.log(data);

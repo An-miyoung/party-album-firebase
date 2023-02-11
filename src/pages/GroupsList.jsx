@@ -1,29 +1,24 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { db } from "../firebase";
-import { ref, onValue } from "firebase/database";
 import styled from "styled-components";
 import Header from "../component/Header";
 import CreateGroup from "../component/CreateGroup";
 import { ROUTE_UTILS } from "../routes";
-import { useRecoilState } from "recoil";
-import { groupDataState } from "../store/groupData";
+import DeleteIcon from "@mui/icons-material/Delete";
+import useGroupData from "../hooks/useGroupData";
+import { DeleteModal } from "../component/modal/DeleteModal";
 
 const GroupsList = () => {
-  const [groupData, setGroupData] = useRecoilState(groupDataState);
-  const groupNameRef = ref(db, "groups/");
+  const { groupData } = useGroupData();
 
-  const readGroupData = useCallback(() => {
-    onValue(groupNameRef, (snapshot) => {
-      setGroupData([]);
-      const data = Object.values(snapshot.val());
-      data.map((item) => setGroupData((prev) => [...prev, item]));
-    });
-  }, [groupNameRef, setGroupData]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  useEffect(() => {
-    readGroupData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleDelete = () => {
+    setShowDeleteModal(true);
+  };
+
+  const handleShowDeleteModal = useCallback(() => {
+    setShowDeleteModal(false);
   }, []);
 
   return (
@@ -41,6 +36,15 @@ const GroupsList = () => {
               >
                 {groupName}
               </Link>
+
+              <DeleteIcon
+                style={{ color: "white", verticalAlign: "sub" }}
+                onClick={handleDelete}
+              />
+              <DeleteModal
+                open={showDeleteModal}
+                handleClose={handleShowDeleteModal}
+              />
             </StyleCardItem>
           ))}
       </StyleCardContainer>
@@ -61,6 +65,9 @@ const StyleCardContainer = styled.div`
 `;
 
 const StyleCardItem = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 3vh;
   min-width: 30vw;
   background-color: #dd8ea4;
   filter: drop-shadow(0px 4px 4px rgb(0, 0, 0, 0.25));
@@ -78,6 +85,8 @@ const StyleCardItem = styled.div`
   @media screen and (max-width: 500px) {
     font-size: 4vw;
     min-height: 80px;
+    flex-direction: column;
+    justify-content: flex-start;
   }
 `;
 

@@ -16,8 +16,12 @@ import Gnoggi from "../static/image/gnoggi.jpeg";
 import Signin from "../static/image/bg_signin.png";
 import GroupDetailsModal from "../component/modal/GroupDetailsModal";
 import { groupMembersState } from "../store/groupMembers";
+import useGroupData from "../hooks/useGroupData";
 
 const Post = () => {
+  // hook 테스트용
+  const data = useGroupData();
+
   const { guid } = useParams();
   const [anchorEl, setAnchorEl] = useState(null);
   const isMobile = useMediaQuery("(max-width: 600px)");
