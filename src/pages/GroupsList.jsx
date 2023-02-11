@@ -1,5 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { Link } from "react-router-dom";
+import { ref, remove } from "firebase/database";
+import { db } from "../firebase";
 import styled from "styled-components";
 import Header from "../component/Header";
 import CreateGroup from "../component/CreateGroup";
@@ -7,13 +9,22 @@ import { ROUTE_UTILS } from "../routes";
 import DeleteIcon from "@mui/icons-material/Delete";
 import useGroupData from "../hooks/useGroupData";
 import { DeleteModal } from "../component/modal/DeleteModal";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { groupIdState } from "../store/groupId";
+import { groupDataState } from "../store/groupData";
 
 const GroupsList = () => {
-  const { groupData } = useGroupData();
+  useGroupData();
+  const groupData = useRecoilValue(groupDataState);
+  console.log("groupData: ", groupData);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
-  const handleDelete = () => {
+  const [pickedGroupId, setPickedGroupId] = useRecoilState(groupIdState);
+
+  const handleDelete = (groupId) => {
+    setPickedGroupId(groupId);
     setShowDeleteModal(true);
   };
 
@@ -21,12 +32,23 @@ const GroupsList = () => {
     setShowDeleteModal(false);
   }, []);
 
+  const deleteToData = useCallback(() => {
+    console.log(pickedGroupId);
+    const groupsRef = ref(db, "groups/" + pickedGroupId);
+
+    confirmDelete &&
+      remove(groupsRef).then(() => {
+        setConfirmDelete(false);
+      });
+  }, [confirmDelete, pickedGroupId]);
+
+  deleteToData();
+
   return (
     <StyleContainer>
       <Header />
       <CreateGroup />
       <StyleCardContainer>
-        {console.log(JSON.stringify(groupData))}
         {groupData.length > 0 &&
           groupData.map(({ groupId, groupName, members }, idx) => (
             <StyleCardItem key={`${groupId}-${idx}`}>
@@ -36,18 +58,20 @@ const GroupsList = () => {
               >
                 {groupName}
               </Link>
-
               <DeleteIcon
                 style={{ color: "white", verticalAlign: "sub" }}
-                onClick={handleDelete}
-              />
-              <DeleteModal
-                open={showDeleteModal}
-                handleClose={handleShowDeleteModal}
+                onClick={(e) => {
+                  handleDelete(groupId);
+                }}
               />
             </StyleCardItem>
           ))}
       </StyleCardContainer>
+      <DeleteModal
+        open={showDeleteModal}
+        handleClose={handleShowDeleteModal}
+        handleConfirm={setConfirmDelete}
+      />
     </StyleContainer>
   );
 };

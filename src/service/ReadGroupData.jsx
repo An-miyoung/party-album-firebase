@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { db } from "../firebase";
 import { ref, onValue } from "firebase/database";
 import { useRecoilState } from "recoil";

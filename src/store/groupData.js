@@ -2,7 +2,14 @@ import { atom, selectorFamily } from "recoil";
 
 export const groupDataState = atom({
   key: "groupData",
-  default: [],
+  default: [
+    // {
+    //   groupId: undefined,
+    //   groupName: "",
+    //   groupMembers: [],
+    //   timestamp: undefined,
+    // },
+  ],
 });
 
 export const groupDataPicker = selectorFamily({

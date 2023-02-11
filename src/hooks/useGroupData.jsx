@@ -14,18 +14,14 @@ const useGroupData = () => {
     const groupsRef = ref(db, "groups/");
     onValue(groupsRef, (snapshot) => {
       const data = Object.values(snapshot.val());
-      data.map((item) => setGroupData((prev) => [...prev, item]));
-      console.log(data);
+      setGroupData(data);
     });
+    console.log("hook 안의 groupData=> ", groupData);
   }, [setGroupData]);
 
   useEffect(() => {
     readGroupData();
-  }, [readGroupData]);
-
-  return {
-    groupData,
-  };
+  }, [readGroupData, setGroupData]);
 };
 
 export default useGroupData;

@@ -19,18 +19,13 @@ import { groupMembersState } from "../store/groupMembers";
 import useGroupData from "../hooks/useGroupData";
 
 const Post = () => {
-  // hook 테스트용
-  const data = useGroupData();
+  useGroupData();
 
   const { guid } = useParams();
   const [anchorEl, setAnchorEl] = useState(null);
   const isMobile = useMediaQuery("(max-width: 600px)");
   const pickedGroupData = useRecoilValue(groupDataPicker(guid));
   const { groupId, groupName, timestamp, groupMembers } = pickedGroupData[0];
-  // const hasGroupMembers =
-  //   groupMembers !== undefined &&
-  //   groupMembers !== null &&
-  //   groupMembers.length > 0;
 
   const [showAddMembersModal, setShowAddMembersModal] = useState(false);
   const [members, setMembers] = useRecoilState(groupMembersState);
@@ -121,7 +116,7 @@ const Post = () => {
           <ImageList sx={{ paddingLeft: "5vw" }}>
             {itemData.map((item) => (
               <>
-                <ImageListItem key={item.img} sx={{ width: "40vw" }}>
+                <ImageListItem key={item.timestamp} sx={{ width: "40vw" }}>
                   <img
                     src={`${item.img}?w=248&fit=crop&auto=format`}
                     srcSet={`${item.img}?w=248&fit=crop&auto=format&dpr=2 2x`}

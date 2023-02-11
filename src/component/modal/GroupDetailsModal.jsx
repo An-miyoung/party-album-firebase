@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogTitle,
   Input,
+  Typography,
 } from "@mui/material";
 
 const GroupDetailsModal = ({
@@ -54,7 +55,7 @@ const GroupDetailsModal = ({
 
   return (
     <Dialog open={open} onClose={closeModal}>
-      {name === "groupName" ? (
+      {name === "groupName" && (
         <>
           <DialogTitle>그룹이름을 입력해 주세요.</DialogTitle>
           <DialogContent>
@@ -66,13 +67,29 @@ const GroupDetailsModal = ({
             />
           </DialogContent>
         </>
+      )}
+      {inputValue !== undefined &&
+      inputValue !== null &&
+      inputValue.length > 0 ? (
+        <>
+          <DialogTitle>그룹멤버들을 추가 입력해 주세요.</DialogTitle>
+          <DialogContent>
+            <Typography>{inputValue}</Typography>
+            <Input
+              type="text"
+              placeholder="이름간 콤마(,)로 구분입력"
+              fullWidth
+              onChange={handleMemberChange}
+            />
+          </DialogContent>
+        </>
       ) : (
         <>
           <DialogTitle>그룹멤버들을 입력해 주세요.</DialogTitle>
           <DialogContent>
             <Input
               type="text"
-              placeholder="멤버이름"
+              placeholder="이름간 콤마(,)로 구분입력"
               fullWidth
               onChange={handleMemberChange}
             />
