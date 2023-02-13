@@ -6,7 +6,6 @@ import {
   DialogContent,
   DialogTitle,
   Input,
-  Typography,
 } from "@mui/material";
 
 const GroupDetailsModal = ({
@@ -17,32 +16,30 @@ const GroupDetailsModal = ({
   setInputValue,
   handleCreate,
 }) => {
-  const [memberString, setMembersString] = useState("");
+  const [member, setMember] = useState("");
 
   const closeModal = useCallback(() => {
     setInputValue("");
     handleClose();
   }, [handleClose, setInputValue]);
 
-  const handleInputComplete = useCallback(() => {
+  const handleNameInputComplete = useCallback(() => {
     if (inputValue.length > 0) {
-      handleCreate();
-      handleClose();
-    } else if (memberString.length > 0) {
-      console.log(memberString.trim().split(","));
-      setInputValue(memberString.trim().split(","));
       handleCreate();
       handleClose();
     } else {
       alert("내용이 입력되지 않았습니다. 다시 시도해 주세요.");
     }
-  }, [
-    handleClose,
-    handleCreate,
-    inputValue.length,
-    memberString,
-    setInputValue,
-  ]);
+  }, [handleClose, handleCreate, inputValue.length]);
+
+  const handleMemberInputComplete = useCallback(() => {
+    if (inputValue.length > 0) {
+      handleCreate();
+      handleClose();
+    } else {
+      alert("내용이 입력되지 않았습니다. 다시 시도해 주세요.");
+    }
+  }, [handleClose, handleCreate, inputValue.length]);
 
   const handleNameChange = (e) => {
     setInputValue(e.target.value);
@@ -50,58 +47,63 @@ const GroupDetailsModal = ({
 
   const handleMemberChange = (e) => {
     console.log(e.target.value);
-    setMembersString(e.target.value);
+    setMember(e.target.value);
+  };
+
+  const handleMemberStoreSet = () => {
+    setInputValue((prev) => [...prev, member]);
+    setMember("");
+  };
+
+  const renderState = {
+    groupName: {
+      title: "그룹이름을 입력해 주세요.",
+      placeholder: "그룹이름",
+      onChange: handleNameChange,
+      onComplete: handleNameInputComplete,
+    },
+    changeName: {
+      title: "수정할 그룹이름을 입력해 주세요.",
+      placeholder: "그룹이름",
+      onChange: handleNameChange,
+      onComplete: handleNameInputComplete,
+    },
+    addMembers: {
+      title: "그룹멤버이름을 입력해 주세요.",
+      placeholder: "이름입력 후 추가버튼 ",
+      onChange: handleMemberChange,
+      onComplete: handleMemberInputComplete,
+    },
   };
 
   return (
-    <Dialog open={open} onClose={closeModal}>
-      {name === "groupName" && (
-        <>
-          <DialogTitle>그룹이름을 입력해 주세요.</DialogTitle>
-          <DialogContent>
-            <Input
-              type="text"
-              placeholder="그룹이름"
-              fullWidth
-              onChange={handleNameChange}
-            />
-          </DialogContent>
-        </>
+    <>
+      {Object.keys(renderState).map(
+        (state, idx) =>
+          state === name && (
+            <Dialog open={open} onClose={closeModal} key={idx}>
+              <DialogTitle>{renderState[state].title}</DialogTitle>
+              <DialogContent sx={{ display: "flex", flexDirection: "row" }}>
+                <Input
+                  type="text"
+                  placeholder={renderState[state].placeholder}
+                  fullWidth
+                  onChange={renderState[state].onChange}
+                />
+                {state === "addMembers" && (
+                  <Button variant="outlined" onClick={handleMemberStoreSet}>
+                    추가
+                  </Button>
+                )}
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={closeModal}>취소</Button>
+                <Button onClick={renderState[state].onComplete}>만들기</Button>
+              </DialogActions>
+            </Dialog>
+          )
       )}
-      {inputValue !== undefined &&
-      inputValue !== null &&
-      inputValue.length > 0 ? (
-        <>
-          <DialogTitle>그룹멤버들을 추가 입력해 주세요.</DialogTitle>
-          <DialogContent>
-            <Typography>{inputValue}</Typography>
-            <Input
-              type="text"
-              placeholder="이름간 콤마(,)로 구분입력"
-              fullWidth
-              onChange={handleMemberChange}
-            />
-          </DialogContent>
-        </>
-      ) : (
-        <>
-          <DialogTitle>그룹멤버들을 입력해 주세요.</DialogTitle>
-          <DialogContent>
-            <Input
-              type="text"
-              placeholder="이름간 콤마(,)로 구분입력"
-              fullWidth
-              onChange={handleMemberChange}
-            />
-          </DialogContent>
-        </>
-      )}
-
-      <DialogActions>
-        <Button onClick={closeModal}>취소</Button>
-        <Button onClick={handleInputComplete}>만들기</Button>
-      </DialogActions>
-    </Dialog>
+    </>
   );
 };
 

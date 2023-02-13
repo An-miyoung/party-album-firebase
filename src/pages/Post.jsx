@@ -27,7 +27,7 @@ const Post = () => {
   const pickedGroupData = useRecoilValue(groupDataPicker(guid));
   const { groupId, groupName, timestamp, groupMembers } = pickedGroupData[0];
 
-  const [showAddMembersModal, setShowAddMembersModal] = useState(false);
+  const [showGroupDetailsModal, setShowGroupDetailsModal] = useState(false);
   const [members, setMembers] = useRecoilState(groupMembersState);
 
   const itemData = [
@@ -60,13 +60,13 @@ const Post = () => {
     setAnchorEl(null);
   }, []);
 
-  const handleAddMembersModalOpen = useCallback(() => {
-    setShowAddMembersModal(true);
+  const handleGroupDetailsModalOpen = useCallback(() => {
+    setShowGroupDetailsModal(true);
     handleCloseMenu();
   }, [handleCloseMenu]);
 
-  const handleShowAddMembersModal = useCallback(() => {
-    setShowAddMembersModal(false);
+  const handleShowGroupDetailsModal = useCallback(() => {
+    setShowGroupDetailsModal(false);
   }, []);
 
   const writeToDatabase = useCallback(async () => {
@@ -74,6 +74,11 @@ const Post = () => {
     updates["/groups/" + guid + "/groupMembers"] = members;
     await update(ref(db), updates);
   }, [guid, members]);
+
+  const handleNameString = useCallback(() => {
+    console.log("members : ", members);
+    writeToDatabase();
+  }, [members, writeToDatabase]);
 
   return (
     <StyleContainer>
@@ -100,7 +105,7 @@ const Post = () => {
           onClose={handleCloseMenu}
           anchorOrigin={{ vertical: "top", horizontal: "right" }}
         >
-          <MenuItem onClick={handleAddMembersModalOpen}>
+          <MenuItem onClick={handleGroupDetailsModalOpen}>
             <Typography textAlign="center">멤버추가</Typography>
           </MenuItem>
           <MenuItem>
@@ -159,12 +164,12 @@ const Post = () => {
         </>
       )}
       <GroupDetailsModal
-        open={showAddMembersModal}
-        handleClose={handleShowAddMembersModal}
-        name="groupMembers"
+        open={showGroupDetailsModal}
+        handleClose={handleShowGroupDetailsModal}
+        name="addMembers"
         inputValue={members}
         setInputValue={setMembers}
-        handleCreate={writeToDatabase}
+        handleCreate={handleNameString}
       />
     </StyleContainer>
   );
