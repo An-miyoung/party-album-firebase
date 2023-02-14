@@ -25,7 +25,7 @@ const GroupDetailsModal = ({
 
   // addMembers 가 호출될때 필요사항
   const groupMembers = useRecoilValue(groupMembersState);
-  const groupMembersString = groupMembers?.join(" ") || null;
+  const groupMembersString = groupMembers?.join(",") || null;
   const [member, setMember] = useState("");
 
   const closeModal = useCallback(() => {

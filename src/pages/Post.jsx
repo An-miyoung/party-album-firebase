@@ -30,6 +30,7 @@ const Post = () => {
 
   const [showGroupDetailsModal, setShowGroupDetailsModal] = useState(false);
   const [members, setMembers] = useState([]);
+  const groupMembersString = groupMembers?.join(",") || null;
 
   const itemData = [
     {
@@ -91,6 +92,8 @@ const Post = () => {
           paddingLeft: "5vw",
           display: "flex",
           flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "baseline",
         }}
       >
         <Button variant="outlined" onClick={handleOpenMenu}>
@@ -100,6 +103,17 @@ const Post = () => {
             {groupName}
           </Typography>
         </Button>
+        <Typography
+          component="div"
+          sx={{
+            fontSize: "2vw",
+            color: "#403234",
+            verticalAlign: "bottom",
+            paddingRight: "5vw",
+          }}
+        >
+          그룹멤버 : {groupMembersString}
+        </Typography>
 
         <Menu
           sx={{ mt: "45px" }}
