@@ -40,7 +40,7 @@ const CreateGroup = () => {
         <GroupDetailsModal
           open={showGroupDetailsModal}
           handleClose={handleShowGroupDetailsModal}
-          name="groupName"
+          name="createName"
           inputValue={groupName}
           setInputValue={setGroupName}
           handleCreate={writeToDatabase}
