@@ -7,7 +7,7 @@ import { ImageList, ImageListItem, ImageListItemBar } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useParams } from "react-router-dom";
-import { useRecoilValue, useRecoilState } from "recoil";
+import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
 import Header from "../component/Header";
 import { groupDataPicker } from "../store/groupData";
 import GreenPasta from "../static/image/green-pasta.jpeg";
@@ -26,9 +26,10 @@ const Post = () => {
   const isMobile = useMediaQuery("(max-width: 600px)");
   const pickedGroupData = useRecoilValue(groupDataPicker(guid));
   const { groupId, groupName, timestamp, groupMembers } = pickedGroupData[0];
+  const setGroupMembers = useSetRecoilState(groupMembersState);
 
   const [showGroupDetailsModal, setShowGroupDetailsModal] = useState(false);
-  const [members, setMembers] = useRecoilState(groupMembersState);
+  const [members, setMembers] = useState([]);
 
   const itemData = [
     {
@@ -61,9 +62,10 @@ const Post = () => {
   }, []);
 
   const handleGroupDetailsModalOpen = useCallback(() => {
+    setGroupMembers(groupMembers);
     setShowGroupDetailsModal(true);
     handleCloseMenu();
-  }, [handleCloseMenu]);
+  }, [groupMembers, handleCloseMenu, setGroupMembers]);
 
   const handleShowGroupDetailsModal = useCallback(() => {
     setShowGroupDetailsModal(false);
@@ -71,9 +73,10 @@ const Post = () => {
 
   const writeToDatabase = useCallback(async () => {
     const updates = {};
-    updates["/groups/" + guid + "/groupMembers"] = members;
+    const newMembers = groupMembers?.concat(members) || members;
+    updates["/groups/" + guid + "/groupMembers"] = newMembers;
     await update(ref(db), updates);
-  }, [guid, members]);
+  }, [groupMembers, guid, members]);
 
   const handleNameString = useCallback(() => {
     console.log("members : ", members);

@@ -6,7 +6,11 @@ import {
   DialogContent,
   DialogTitle,
   Input,
+  Typography,
 } from "@mui/material";
+import { useRecoilValue } from "recoil";
+import { groupNameState } from "../../store/groupName";
+import { groupMembersState } from "../../store/groupMembers";
 
 const GroupDetailsModal = ({
   open,
@@ -16,6 +20,12 @@ const GroupDetailsModal = ({
   setInputValue,
   handleCreate,
 }) => {
+  // changeGroupName 이 호출될때 필요사항
+  const groupName = useRecoilValue(groupNameState);
+
+  // addMembers 가 호출될때 필요사항
+  const groupMembers = useRecoilValue(groupMembersState);
+  const groupMembersString = groupMembers?.join(" ") || null;
   const [member, setMember] = useState("");
 
   const closeModal = useCallback(() => {
@@ -23,16 +33,7 @@ const GroupDetailsModal = ({
     handleClose();
   }, [handleClose, setInputValue]);
 
-  const handleNameInputComplete = useCallback(() => {
-    if (inputValue.length > 0) {
-      handleCreate();
-      handleClose();
-    } else {
-      alert("내용이 입력되지 않았습니다. 다시 시도해 주세요.");
-    }
-  }, [handleClose, handleCreate, inputValue.length]);
-
-  const handleMemberInputComplete = useCallback(() => {
+  const handleInputComplete = useCallback(() => {
     if (inputValue.length > 0) {
       handleCreate();
       handleClose();
@@ -50,7 +51,7 @@ const GroupDetailsModal = ({
     setMember(e.target.value);
   };
 
-  const handleMemberStoreSet = () => {
+  const handleMemberStoreSet = (e) => {
     setInputValue((prev) => [...prev, member]);
     setMember("");
   };
@@ -59,20 +60,23 @@ const GroupDetailsModal = ({
     groupName: {
       title: "그룹이름을 입력해 주세요.",
       placeholder: "그룹이름",
+      showData: null,
       onChange: handleNameChange,
-      onComplete: handleNameInputComplete,
+      onComplete: handleInputComplete,
     },
     changeName: {
       title: "수정할 그룹이름을 입력해 주세요.",
       placeholder: "그룹이름",
+      showData: groupName,
       onChange: handleNameChange,
-      onComplete: handleNameInputComplete,
+      onComplete: handleInputComplete,
     },
     addMembers: {
       title: "그룹멤버이름을 입력해 주세요.",
       placeholder: "이름입력 후 추가버튼 ",
+      showData: groupMembersString,
       onChange: handleMemberChange,
-      onComplete: handleMemberInputComplete,
+      onComplete: handleInputComplete,
     },
   };
 
@@ -83,10 +87,12 @@ const GroupDetailsModal = ({
           state === name && (
             <Dialog open={open} onClose={closeModal} key={idx}>
               <DialogTitle>{renderState[state].title}</DialogTitle>
+              <DialogContent>{renderState[state].showData}</DialogContent>
               <DialogContent sx={{ display: "flex", flexDirection: "row" }}>
                 <Input
                   type="text"
                   placeholder={renderState[state].placeholder}
+                  value={member}
                   fullWidth
                   onChange={renderState[state].onChange}
                 />
