@@ -1,17 +1,19 @@
 import React, { useCallback, useState } from "react";
 import styled from "styled-components";
+import { useParams } from "react-router-dom";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { db } from "../firebase";
 import { ref, update } from "firebase/database";
 import { Box, Button, Menu, MenuItem, Typography } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import { useParams } from "react-router-dom";
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import Header from "../component/Header";
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import { groupDataPicker } from "../store/groupData";
-import GroupDetailsModal from "../component/modal/GroupDetailsModal";
 import { groupMembersState } from "../store/groupMembers";
 import useGroupData from "../hooks/useGroupData";
+import Header from "../component/Header";
 import PostImage from "../component/PostImage";
+import GroupNameModal from "../component/modal/GroupNameModal";
+import AddMembersModal from "../component/modal/AddMembersModal";
 
 const Post = () => {
   useGroupData();
@@ -19,31 +21,46 @@ const Post = () => {
   const { guid } = useParams();
   const [anchorEl, setAnchorEl] = useState(null);
   const pickedGroupData = useRecoilValue(groupDataPicker(guid));
+  console.log("picekdData: ", pickedGroupData);
   const { groupId, groupName, timestamp, groupMembers } = pickedGroupData[0];
-  const setGroupMembers = useSetRecoilState(groupMembersState);
-
-  const [showGroupDetailsModal, setShowGroupDetailsModal] = useState(false);
-  const [members, setMembers] = useState([]);
   const groupMembersString = groupMembers?.join(",") || null;
 
+  // 각 action 에 따른 모달오픈 state
+  const [showGroupNameModal, setShowGroupNameModal] = useState(false);
+  const [showGroupmembersModal, setShowGroupMembersModal] = useState(false);
+  // addMember 에 필요한 변수
+  const setGroupMembers = useSetRecoilState(groupMembersState);
+  const [members, setMembers] = useState([]);
+
+  // anchorRef
   const handleOpenMenu = useCallback((event) => {
     setAnchorEl(event.currentTarget);
   }, []);
   const handleCloseMenu = useCallback(() => {
     setAnchorEl(null);
   }, []);
-
-  const handleGroupDetailsModalOpen = useCallback(() => {
+  // 그룹명 변경
+  const handleGroupNameModalClose = useCallback(() => {
+    setShowGroupNameModal(false);
+    handleCloseMenu();
+  }, [handleCloseMenu]);
+  const handleShowGroupNameModal = useCallback(() => {
+    setShowGroupNameModal(true);
+  }, []);
+  // 멤버 입력
+  const handleGroupmemebrsModalClose = useCallback(() => {
+    setShowGroupMembersModal(false);
+    handleCloseMenu();
+  }, [handleCloseMenu]);
+  const handleShowGroupMembersModal = useCallback(() => {
     setGroupMembers(groupMembers);
     setMembers([]);
-    setShowGroupDetailsModal(true);
-    handleCloseMenu();
-  }, [groupMembers, handleCloseMenu, setGroupMembers]);
+    console.log("realtime 속 member: ", groupMembers);
+    setShowGroupMembersModal(true);
+  }, [groupMembers, setGroupMembers]);
 
-  const handleShowGroupDetailsModal = useCallback(() => {
-    setShowGroupDetailsModal(false);
-  }, []);
-
+  //  member 는 한 단어가 아니라 배열을 받아들여야 해 그 처리를 modal 안에서 할 수 없다.
+  // setValue 후 상태값이 변하는 useEffect 가 일어나기 전에 value 를 읽게 돼서 불가피하게 부모에서 저장처리함.
   const writeToDatabase = useCallback(async () => {
     const updates = {};
     const newMembers = groupMembers?.concat(members) || members;
@@ -55,8 +72,6 @@ const Post = () => {
     console.log("members : ", members);
     writeToDatabase();
   }, [members, writeToDatabase]);
-
-  const addImage = () => {};
 
   return (
     <StyleContainer>
@@ -84,9 +99,18 @@ const Post = () => {
             color: "#403234",
             verticalAlign: "bottom",
             paddingRight: "5vw",
+            width: "30vw",
           }}
         >
-          그룹멤버 : {groupMembersString}
+          <PeopleAltIcon
+            sx={{
+              fontSize: "3vw",
+              color: "#403234",
+              verticalAlign: "sub",
+              marginRight: "1vw",
+            }}
+          />{" "}
+          {groupMembersString}
         </Typography>
         <Menu
           sx={{ mt: "45px" }}
@@ -95,22 +119,27 @@ const Post = () => {
           onClose={handleCloseMenu}
           anchorOrigin={{ vertical: "top", horizontal: "right" }}
         >
-          <MenuItem onClick={handleGroupDetailsModalOpen}>
+          <MenuItem onClick={handleShowGroupMembersModal}>
             <Typography textAlign="center">멤버추가</Typography>
           </MenuItem>
-          <MenuItem onClick={addImage}>
+          <MenuItem>
             <Typography textAlign="center">사진추가</Typography>
           </MenuItem>
-          <MenuItem>
+          <MenuItem onClick={handleShowGroupNameModal}>
             <Typography textAlign="center">그룹이름수정</Typography>
           </MenuItem>
         </Menu>
       </Box>
       <PostImage />
-      <GroupDetailsModal
-        open={showGroupDetailsModal}
-        handleClose={handleShowGroupDetailsModal}
-        name="addMembers"
+      <GroupNameModal
+        open={showGroupNameModal}
+        handleClose={handleGroupNameModalClose}
+        action="changeName"
+        guid={guid}
+      />
+      <AddMembersModal
+        open={showGroupmembersModal}
+        handleClose={handleGroupmemebrsModalClose}
         inputValue={members}
         setInputValue={setMembers}
         handleCreate={handleNameString}

@@ -1,11 +1,11 @@
 import React, { useCallback, useState } from "react";
 import styled from "styled-components";
-import GroupDetailsModal from "./modal/GroupDetailsModal";
 import { useRecoilState } from "recoil";
 import { groupNameState } from "../store/groupName";
-import { db } from "../firebase";
-import { set, ref, serverTimestamp } from "firebase/database";
-import { uid } from "uid";
+import GroupNameModal from "./modal/GroupNameModal";
+// import { db } from "../firebase";
+// import { set, ref, serverTimestamp } from "firebase/database";
+// import { uid } from "uid";
 
 const CreateGroup = () => {
   const [showGroupDetailsModal, setShowGroupDetailsModal] = useState(false);
@@ -19,14 +19,14 @@ const CreateGroup = () => {
     setShowGroupDetailsModal(true);
   }, []);
 
-  const writeToDatabase = useCallback(() => {
-    const guid = uid();
-    set(ref(db, "groups/" + guid), {
-      timestamp: serverTimestamp(),
-      groupId: guid,
-      groupName,
-    });
-  }, [groupName]);
+  // const writeToDatabase = useCallback(() => {
+  //   const guid = uid();
+  //   set(ref(db, "groups/" + guid), {
+  //     timestamp: serverTimestamp(),
+  //     groupId: guid,
+  //     groupName,
+  //   });
+  // }, [groupName]);
 
   return (
     <StyleButtonContainer>
@@ -37,13 +37,11 @@ const CreateGroup = () => {
           </StyleInfoText>
           <StyleButton onClick={handleCreateGroup}>모임 추가</StyleButton>
         </StyleButtonLocation>
-        <GroupDetailsModal
+        <GroupNameModal
           open={showGroupDetailsModal}
           handleClose={handleShowGroupDetailsModal}
           name="createName"
-          inputValue={groupName}
-          setInputValue={setGroupName}
-          handleCreate={writeToDatabase}
+          guid={undefined}
         />
       </StyleButtonContainer>
     </StyleButtonContainer>
