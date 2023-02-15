@@ -14,6 +14,8 @@ import Header from "../component/Header";
 import PostImage from "../component/PostImage";
 import GroupNameModal from "../component/modal/GroupNameModal";
 import AddMembersModal from "../component/modal/AddMembersModal";
+import UploadImageModal from "../component/modal/UploadImageModal";
+import { groupIdState } from "../store/groupId";
 
 const Post = () => {
   useGroupData();
@@ -22,12 +24,16 @@ const Post = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const pickedGroupData = useRecoilValue(groupDataPicker(guid));
   console.log("picekdData: ", pickedGroupData);
-  const { groupId, groupName, timestamp, groupMembers } = pickedGroupData[0];
+  const { groupName, timestamp, groupMembers } = pickedGroupData[0];
+  const setGroupId = useSetRecoilState(groupIdState);
   const groupMembersString = groupMembers?.join(",") || null;
 
+  setGroupId(guid);
+
   // 각 action 에 따른 모달오픈 state
-  const [showGroupNameModal, setShowGroupNameModal] = useState(false);
+  const [showUploadImageModal, setShowUploadImageModal] = useState(false);
   const [showGroupmembersModal, setShowGroupMembersModal] = useState(false);
+  const [showGroupNameModal, setShowGroupNameModal] = useState(false);
   // addMember 에 필요한 변수
   const setGroupMembers = useSetRecoilState(groupMembersState);
   const [members, setMembers] = useState([]);
@@ -39,14 +45,7 @@ const Post = () => {
   const handleCloseMenu = useCallback(() => {
     setAnchorEl(null);
   }, []);
-  // 그룹명 변경
-  const handleGroupNameModalClose = useCallback(() => {
-    setShowGroupNameModal(false);
-    handleCloseMenu();
-  }, [handleCloseMenu]);
-  const handleShowGroupNameModal = useCallback(() => {
-    setShowGroupNameModal(true);
-  }, []);
+
   // 멤버 입력
   const handleGroupmemebrsModalClose = useCallback(() => {
     setShowGroupMembersModal(false);
@@ -58,6 +57,22 @@ const Post = () => {
     console.log("realtime 속 member: ", groupMembers);
     setShowGroupMembersModal(true);
   }, [groupMembers, setGroupMembers]);
+  // 사진 입력
+  const handleUploadImageModalClose = useCallback(() => {
+    setShowUploadImageModal(false);
+    handleCloseMenu();
+  }, [handleCloseMenu]);
+  const handelShowUploadImageModal = useCallback(() => {
+    setShowUploadImageModal(true);
+  }, []);
+  // 그룹명 변경
+  const handleGroupNameModalClose = useCallback(() => {
+    setShowGroupNameModal(false);
+    handleCloseMenu();
+  }, [handleCloseMenu]);
+  const handleShowGroupNameModal = useCallback(() => {
+    setShowGroupNameModal(true);
+  }, []);
 
   //  member 는 한 단어가 아니라 배열을 받아들여야 해 그 처리를 modal 안에서 할 수 없다.
   // setValue 후 상태값이 변하는 useEffect 가 일어나기 전에 value 를 읽게 돼서 불가피하게 부모에서 저장처리함.
@@ -122,7 +137,7 @@ const Post = () => {
           <MenuItem onClick={handleShowGroupMembersModal}>
             <Typography textAlign="center">멤버추가</Typography>
           </MenuItem>
-          <MenuItem>
+          <MenuItem onClick={handelShowUploadImageModal}>
             <Typography textAlign="center">사진추가</Typography>
           </MenuItem>
           <MenuItem onClick={handleShowGroupNameModal}>
@@ -131,18 +146,23 @@ const Post = () => {
         </Menu>
       </Box>
       <PostImage />
-      <GroupNameModal
-        open={showGroupNameModal}
-        handleClose={handleGroupNameModalClose}
-        action="changeName"
-        guid={guid}
-      />
+
       <AddMembersModal
         open={showGroupmembersModal}
         handleClose={handleGroupmemebrsModalClose}
         inputValue={members}
         setInputValue={setMembers}
         handleCreate={handleNameString}
+      />
+      <UploadImageModal
+        open={showUploadImageModal}
+        handleClose={handleUploadImageModalClose}
+      />
+      <GroupNameModal
+        open={showGroupNameModal}
+        handleClose={handleGroupNameModalClose}
+        action="changeName"
+        guid={guid}
       />
     </StyleContainer>
   );
