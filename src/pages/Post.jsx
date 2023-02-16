@@ -1,41 +1,84 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState, useRecoilState } from "recoil";
 import { db } from "../firebase";
-import { ref, update } from "firebase/database";
+import { child, get, ref, update } from "firebase/database";
 import { Box, Button, Menu, MenuItem, Typography } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import { groupDataState } from "../store/groupData";
 import { groupDataPicker } from "../store/groupData";
 import { groupMembersState } from "../store/groupMembers";
-import useGroupData from "../hooks/useGroupData";
 import Header from "../component/Header";
 import PostImage from "../component/PostImage";
 import GroupNameModal from "../component/modal/GroupNameModal";
 import AddMembersModal from "../component/modal/AddMembersModal";
 import UploadImageModal from "../component/modal/UploadImageModal";
 import { groupIdState } from "../store/groupId";
+import { groupNameState } from "../store/groupName";
 
 const Post = () => {
-  useGroupData();
-
   const { guid } = useParams();
+  const setGroupId = useSetRecoilState(groupIdState);
+  const [groupName, setGroupName] = useRecoilState(groupNameState);
+  const [groupMembers, setGroupMembers] = useRecoilState(groupMembersState);
+
   const [anchorEl, setAnchorEl] = useState(null);
   const pickedGroupData = useRecoilValue(groupDataPicker(guid));
   console.log("picekdData: ", pickedGroupData);
-  const { groupName, timestamp, groupMembers } = pickedGroupData[0];
-  const setGroupId = useSetRecoilState(groupIdState);
-  const groupMembersString = groupMembers?.join(",") || null;
 
-  setGroupId(guid);
+  const readRecoilState = useCallback(() => {
+    const { groupName, groupMembers } = pickedGroupData[0];
+    setGroupId(guid);
+    setGroupName(groupName);
+    setGroupMembers(groupMembers);
+  }, [guid, pickedGroupData, setGroupId, setGroupMembers, setGroupName]);
+
+  const fetchPostData = useCallback(() => {
+    const dbRef = ref(db);
+    get(child(dbRef, `groups/${guid}`))
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          console.log(snapshot.val());
+          const { groupId, groupName, groupMembers } = snapshot.val();
+          setGroupId(guid);
+          setGroupId(groupId);
+          setGroupName(groupName);
+          setGroupMembers(groupMembers);
+        } else {
+          console.log("No data available");
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, [guid, setGroupId, setGroupMembers, setGroupName]);
+
+  useEffect(() => {
+    if (pickedGroupData?.length > 0) {
+      readRecoilState();
+    } else if (
+      pickedGroupData === undefined ||
+      pickedGroupData === null ||
+      pickedGroupData.length === 0
+    ) {
+      fetchPostData();
+    }
+  }, [
+    fetchPostData,
+    pickedGroupData,
+    pickedGroupData?.length,
+    readRecoilState,
+  ]);
+
+  const groupMembersString = groupMembers?.join(",") || null;
 
   // 각 action 에 따른 모달오픈 state
   const [showUploadImageModal, setShowUploadImageModal] = useState(false);
   const [showGroupmembersModal, setShowGroupMembersModal] = useState(false);
   const [showGroupNameModal, setShowGroupNameModal] = useState(false);
   // addMember 에 필요한 변수
-  const setGroupMembers = useSetRecoilState(groupMembersState);
   const [members, setMembers] = useState([]);
   // uploadImage 에 필요한 변수
   const [percent, setPercent] = useState(null);
