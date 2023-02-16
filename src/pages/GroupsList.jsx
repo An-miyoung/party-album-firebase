@@ -16,7 +16,6 @@ import { groupDataState } from "../store/groupData";
 const GroupsList = () => {
   useGroupData();
   const groupData = useRecoilValue(groupDataState);
-  console.log("groupData: ", groupData);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -33,7 +32,6 @@ const GroupsList = () => {
   }, []);
 
   const deleteToData = useCallback(() => {
-    console.log(pickedGroupId);
     const groupsRef = ref(db, "groups/" + pickedGroupId);
 
     confirmDelete &&

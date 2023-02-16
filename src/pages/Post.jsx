@@ -7,7 +7,6 @@ import { child, get, ref, update } from "firebase/database";
 import { Box, Button, Menu, MenuItem, Typography } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
-import { groupDataState } from "../store/groupData";
 import { groupDataPicker } from "../store/groupData";
 import { groupMembersState } from "../store/groupMembers";
 import Header from "../component/Header";
@@ -26,7 +25,6 @@ const Post = () => {
 
   const [anchorEl, setAnchorEl] = useState(null);
   const pickedGroupData = useRecoilValue(groupDataPicker(guid));
-  console.log("picekdData: ", pickedGroupData);
 
   const readRecoilState = useCallback(() => {
     const { groupName, groupMembers } = pickedGroupData[0];
@@ -40,7 +38,6 @@ const Post = () => {
     get(child(dbRef, `groups/${guid}`))
       .then((snapshot) => {
         if (snapshot.exists()) {
-          console.log(snapshot.val());
           const { groupId, groupName, groupMembers } = snapshot.val();
           setGroupId(guid);
           setGroupId(groupId);
@@ -99,7 +96,6 @@ const Post = () => {
   const handleShowGroupMembersModal = useCallback(() => {
     setGroupMembers(groupMembers);
     setMembers([]);
-    console.log("realtime 속 member: ", groupMembers);
     setShowGroupMembersModal(true);
   }, [groupMembers, setGroupMembers]);
   // 사진 입력
@@ -129,9 +125,8 @@ const Post = () => {
   }, [groupMembers, guid, members]);
 
   const handleNameString = useCallback(() => {
-    console.log("members : ", members);
     writeToDatabase();
-  }, [members, writeToDatabase]);
+  }, [writeToDatabase]);
 
   return (
     <StyleContainer>
