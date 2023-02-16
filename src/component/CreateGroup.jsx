@@ -25,7 +25,7 @@ const CreateGroup = () => {
         <GroupNameModal
           open={showGroupDetailsModal}
           handleClose={handleShowGroupDetailsModal}
-          name="createName"
+          action="createName"
           guid={undefined}
         />
       </StyleButtonContainer>
