@@ -37,6 +37,8 @@ const Post = () => {
   // addMember 에 필요한 변수
   const setGroupMembers = useSetRecoilState(groupMembersState);
   const [members, setMembers] = useState([]);
+  // uploadImage 에 필요한 변수
+  const [percent, setPercent] = useState(null);
 
   // anchorRef
   const handleOpenMenu = useCallback((event) => {
@@ -157,6 +159,7 @@ const Post = () => {
       <UploadImageModal
         open={showUploadImageModal}
         handleClose={handleUploadImageModalClose}
+        setPercent={setPercent}
       />
       <GroupNameModal
         open={showGroupNameModal}
