@@ -1,7 +1,6 @@
 export const ROUTES = {
   JOIN: "/join",
   SHOW_POST_DETAIL: "/groups/:guid/post",
-  ADD_MEMBERS: "/groups/:guid/members",
   GROUPS_LIST: "/groups",
 };
 
@@ -11,5 +10,4 @@ const replaceGuid = (route, guid) => route.replace(":guid", guid);
 // 매번 replaceGuid(ROUTES.ADD_MEMBERS, 1234567) 을 부르기 번거롭기 때문에
 export const ROUTE_UTILS = {
   SHOW_POST_DETAIL: (guid) => replaceGuid(ROUTES.SHOW_POST_DETAIL, guid),
-  ADD_MEMBERS: (guid) => replaceGuid(ROUTES.ADD_MEMBERS, guid),
 };

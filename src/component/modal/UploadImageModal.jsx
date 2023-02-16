@@ -1,15 +1,8 @@
 import React, { useCallback, useState } from "react";
 import { db, storage } from "../../firebase";
-import {
-  getDatabase,
-  push,
-  ref,
-  serverTimestamp,
-  set,
-} from "firebase/database";
+import { push, ref, serverTimestamp, set } from "firebase/database";
 import {
   ref as refStorage,
-  uploadBytes,
   uploadBytesResumable,
   getDownloadURL,
 } from "firebase/storage";
@@ -21,6 +14,7 @@ import {
   DialogContent,
   DialogTitle,
   Input,
+  Typography,
 } from "@mui/material";
 import { useRecoilValue } from "recoil";
 import { groupIdState } from "../../store/groupId";
@@ -28,11 +22,16 @@ import { groupIdState } from "../../store/groupId";
 function ImageModal({ open, handleClose, setPercent }) {
   const groupId = useRecoilValue(groupIdState);
   const [file, setFile] = useState(null);
+  const [title, setTitle] = useState("");
 
   const closeModal = useCallback(() => {
     handleClose();
     setFile("");
   }, [handleClose]);
+
+  const onChangeTitle = useCallback((e) => {
+    setTitle(e.target.value);
+  }, []);
 
   const onChangeAddFile = useCallback((e) => {
     const addedFile = e.target.files[0];
@@ -51,9 +50,9 @@ function ImageModal({ open, handleClose, setPercent }) {
         // avatar: user.currentUser.photoURL,
       },
       img: fileUrl,
-      title: "올린 사진",
+      title,
     }),
-    [groupId]
+    [groupId, title]
   );
 
   const uploadFile = useCallback(() => {
@@ -106,7 +105,7 @@ function ImageModal({ open, handleClose, setPercent }) {
   return (
     <>
       <Dialog open={open} onClose={closeModal}>
-        <DialogTitle>사진을 선택해 주세요</DialogTitle>
+        <DialogTitle>사진을 선택해 주세요.</DialogTitle>
         <DialogContent>
           <Input
             type="file"
@@ -116,6 +115,9 @@ function ImageModal({ open, handleClose, setPercent }) {
             fullWidth
             onChange={onChangeAddFile}
           />
+          <div style={{ height: "3vh" }} />
+          <Typography> 사진에 대한 설명 :</Typography>
+          <Input type="text" fullWidth onChange={onChangeTitle} />
         </DialogContent>
         <DialogActions>
           <Button onClick={closeModal}>취소</Button>
@@ -127,72 +129,3 @@ function ImageModal({ open, handleClose, setPercent }) {
 }
 
 export default ImageModal;
-
-// const UploadImageModal = ({ open, handleClose }) => {
-//   const groupId = useRecoilValue(groupIdState);
-//   const [uploadedImage, setUploadedImage] = useState("");
-
-//   const closeModal = useCallback(() => {
-//     handleClose();
-//     setUploadedImage("");
-//   }, [handleClose]);
-
-//   const handleChange = useCallback((e) => {
-//     const selectedImageFile = e.target.files[0];
-//     if (!selectedImageFile) return;
-//     setUploadedImage(selectedImageFile);
-
-//     console.log("사진을 선택했음");
-//   }, []);
-
-//   const handleInputComplete = useCallback(async () => {
-//     const storageRef = refStorage(
-//       storage,
-//       `postImages/${groupId}/${uid()}.${uploadedImage.name.split(".").pop()}`
-//     );
-
-//     const uploadTask = await uploadBytes(storageRef, uploadedImage);
-//     const downloadUrl = await getDownloadURL(uploadTask.ref);
-//     setUploadedImage(downloadUrl);
-//     console.log("사진올렸음");
-//     handleClose();
-//   }, [groupId, handleClose, uploadedImage]);
-
-//   const createImageMessage = useCallback(
-//     (fileUrl) => ({
-//       timestamp: serverTimestamp(),
-//       user: {
-//         // id: user.currentUser.uid,
-//         // name: user.currentUser.displayName,
-//         // avatar: user.currentUser.photoURL,
-//         name: "미영",
-//       },
-//       image: fileUrl,
-//     }),
-//     []
-//   );
-
-//   return (
-//     <>
-//       <Dialog open={open} onClose={closeModal}>
-//         <DialogTitle>사진을 선택해 주세요</DialogTitle>
-//         <DialogContent>
-//           <Input
-//             type="file"
-//             inputProps={{
-//               accept: "image/jpg, image/jpeg, image/gif, image/png ",
-//             }}
-//             fullWidth
-//             onChange={handleChange}
-//           />
-//         </DialogContent>
-//         <DialogActions>
-//           <Button onClick={closeModal}>취소</Button>
-//           <Button onClick={handleInputComplete}>사진올리기</Button>
-//         </DialogActions>
-//       </Dialog>
-//     </>
-//   );
-// };
-
-// export default UploadImageModal;

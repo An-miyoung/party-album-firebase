@@ -5,11 +5,6 @@ import { ImageList, ImageListItem, ImageListItemBar } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useRecoilValue } from "recoil";
 import { groupIdState } from "../store/groupId";
-import GreenPasta from "../static/image/green-pasta.jpeg";
-import WhitePasta from "../static/image/white-pasta.jpeg";
-import Gnoggi from "../static/image/gnoggi.jpeg";
-import Signin from "../static/image/bg_signin.png";
-import useGroupData from "../hooks/useGroupData";
 
 const PostImages = () => {
   const isMobile = useMediaQuery("(max-width: 600px)");
@@ -17,7 +12,11 @@ const PostImages = () => {
   const [imgData, setImgData] = useState([]);
 
   useEffect(() => {
-    if (!groupId) return;
+    setImgData([]);
+    if (!groupId) {
+      alert("존재하지 않는 모임앨범입니다.");
+      return;
+    }
 
     const getImages = () => {
       const imageRef = ref(db, `groups/${groupId}/postImages/`);
@@ -32,25 +31,6 @@ const PostImages = () => {
       setImgData([]);
     };
   }, [groupId]);
-
-  // const itemData = [
-  //   {
-  //     img: Signin,
-  //     title: "카페 한구석 멋진 풍경",
-  //   },
-  //   {
-  //     img: WhitePasta,
-  //     title: "트러풀이 들어 간 파스타",
-  //   },
-  //   {
-  //     img: GreenPasta,
-  //     title: "캐비어가 들어 간 생면 파스타",
-  //   },
-  //   {
-  //     img: Gnoggi,
-  //     title: "엄지척 뇨끼~~ 진짜 대박 맛있음",
-  //   },
-  // ];
 
   return (
     <>

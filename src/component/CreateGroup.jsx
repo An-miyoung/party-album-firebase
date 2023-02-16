@@ -1,15 +1,9 @@
 import React, { useCallback, useState } from "react";
 import styled from "styled-components";
-import { useRecoilState } from "recoil";
-import { groupNameState } from "../store/groupName";
 import GroupNameModal from "./modal/GroupNameModal";
-// import { db } from "../firebase";
-// import { set, ref, serverTimestamp } from "firebase/database";
-// import { uid } from "uid";
 
 const CreateGroup = () => {
   const [showGroupDetailsModal, setShowGroupDetailsModal] = useState(false);
-  const [groupName, setGroupName] = useRecoilState(groupNameState);
 
   const handleShowGroupDetailsModal = useCallback(() => {
     setShowGroupDetailsModal(false);
@@ -18,15 +12,6 @@ const CreateGroup = () => {
   const handleCreateGroup = useCallback(() => {
     setShowGroupDetailsModal(true);
   }, []);
-
-  // const writeToDatabase = useCallback(() => {
-  //   const guid = uid();
-  //   set(ref(db, "groups/" + guid), {
-  //     timestamp: serverTimestamp(),
-  //     groupId: guid,
-  //     groupName,
-  //   });
-  // }, [groupName]);
 
   return (
     <StyleButtonContainer>

@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { Link } from "react-router-dom";
-import { auth } from "../firebase";
+// import { auth } from "../firebase";
 // import {
 //   getAuth,
 //   createUserWithEmailAndPassword,
