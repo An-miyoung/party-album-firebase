@@ -7,6 +7,7 @@ import { child, get, ref, update } from "firebase/database";
 import { Box, Button, Menu, MenuItem, Typography } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import { groupDataPicker } from "../store/groupData";
 import { groupMembersState } from "../store/groupMembers";
 import Header from "../component/Header";
@@ -22,6 +23,7 @@ const Post = () => {
   const setGroupId = useSetRecoilState(groupIdState);
   const [groupName, setGroupName] = useRecoilState(groupNameState);
   const [groupMembers, setGroupMembers] = useRecoilState(groupMembersState);
+  const isMobile = useMediaQuery("(max-width: 600px)");
 
   const [anchorEl, setAnchorEl] = useState(null);
   const pickedGroupData = useRecoilValue(groupDataPicker(guid));
@@ -137,7 +139,6 @@ const Post = () => {
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
-          alignItems: "baseline",
         }}
       >
         <Button variant="outlined" onClick={handleOpenMenu}>
@@ -147,27 +148,54 @@ const Post = () => {
             {groupName}
           </Typography>
         </Button>
-        <Typography
-          component="div"
-          sx={{
-            fontSize: "4vw",
-            color: "#403234",
-            verticalAlign: "bottom",
-            paddingRight: "5vw",
-            width: "30vw",
-          }}
-        >
-          <div style={{ width: "1vw" }} />
-          <PeopleAltIcon
+        {isMobile ? (
+          <Typography
+            component="div"
             sx={{
               fontSize: "4vw",
               color: "#403234",
-              verticalAlign: "sub",
-              marginRight: "1vw",
+              verticalAlign: "super",
+              paddingRight: "5vw",
+              width: "30vw",
+              overflowWrap: "break-word",
+              wordBreak: "keep-all",
             }}
-          />{" "}
-          {groupMembersString}
-        </Typography>
+          >
+            <div style={{ width: "1vw" }} />
+            <PeopleAltIcon
+              sx={{
+                fontSize: "5vw",
+                color: "#403234",
+                marginRight: "1vw",
+              }}
+            />{" "}
+            {groupMembersString}
+          </Typography>
+        ) : (
+          <Typography
+            component="div"
+            sx={{
+              fontSize: "20px",
+              color: "#403234",
+              verticalAlign: "bottom",
+              paddingRight: "5vw",
+              width: "30vw",
+              overflowWrap: "break-word",
+              wordBreak: "keep-all",
+            }}
+          >
+            <div style={{ width: "1vw" }} />
+            <PeopleAltIcon
+              sx={{
+                fontSize: "20px",
+                color: "#403234",
+                verticalAlign: "sub",
+                marginRight: "1vw",
+              }}
+            />{" "}
+            {groupMembersString}
+          </Typography>
+        )}
         <Menu
           sx={{ mt: "45px" }}
           anchorEl={anchorEl}

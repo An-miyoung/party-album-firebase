@@ -24,17 +24,15 @@ const AddMembersModal = ({
 
   const handleInputComplete = useCallback(() => {
     if (inputValue?.length > 0) {
-      console.log("모달속의 member: ", member);
       handleCreate();
       setMember("");
       handleClose();
     } else {
       alert("내용이 입력되지 않았습니다. 다시 시도해 주세요.");
     }
-  }, [handleClose, handleCreate, inputValue.length, member]);
+  }, [handleClose, handleCreate, inputValue?.length]);
 
   const handleChange = useCallback((e) => {
-    console.log(e.target.value);
     setMember(e.target.value);
   }, []);
 

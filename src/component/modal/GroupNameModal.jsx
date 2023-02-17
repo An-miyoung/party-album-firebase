@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { db } from "../../firebase";
-import { set, ref, serverTimestamp } from "firebase/database";
+import { set, ref, serverTimestamp, update } from "firebase/database";
 import { uid } from "uid";
 import {
   Button,
@@ -34,13 +34,12 @@ const GroupNameModal = ({ open, handleClose, action, guid }) => {
     });
   }, [groupName]);
 
-  const updateToDatabase = useCallback(() => {
+  const updateToDatabase = useCallback(async () => {
     if (guid !== undefined && guid.length > 0) {
-      set(ref(db, "groups/" + guid), {
-        timestamp: serverTimestamp(),
-        guid,
-        groupName,
-      });
+      const updates = {};
+      const newGroupName = groupName;
+      updates["groups/" + guid + "/groupName"] = newGroupName;
+      await update(ref(db), updates);
     }
   }, [groupName, guid]);
 
