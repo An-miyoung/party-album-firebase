@@ -142,7 +142,7 @@ const Post = () => {
       >
         <Button variant="outlined" onClick={handleOpenMenu}>
           <MenuIcon />
-          <div style={{ width: "2vw" }} />
+          <div style={{ width: "1.5vw" }} />
           <Typography component="div" variant="h6">
             {groupName}
           </Typography>
@@ -150,16 +150,17 @@ const Post = () => {
         <Typography
           component="div"
           sx={{
-            fontSize: "2vw",
+            fontSize: "4vw",
             color: "#403234",
             verticalAlign: "bottom",
             paddingRight: "5vw",
             width: "30vw",
           }}
         >
+          <div style={{ width: "1vw" }} />
           <PeopleAltIcon
             sx={{
-              fontSize: "3vw",
+              fontSize: "4vw",
               color: "#403234",
               verticalAlign: "sub",
               marginRight: "1vw",
