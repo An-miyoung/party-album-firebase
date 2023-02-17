@@ -16,25 +16,25 @@ export const DeleteModal = ({ open, handleClose, groupId }) => {
     remove(groupsRef)
       .then(() => {
         console.log("realtime삭제");
+
+        listAll(deleteRef)
+          .then((res) => {
+            res.items.forEach((itemRef) => {
+              deleteObject(itemRef)
+                .then(() => {
+                  console.log("storge 에서 삭제");
+                })
+                .catch((error) => {
+                  console.log("storage 삭제 실패 : ", error);
+                });
+            });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       })
       .catch((error) => {
         console.log("realTime database 삭제 실패 : ", error);
-      });
-
-    listAll(deleteRef)
-      .then((res) => {
-        res.items.forEach((itemRef) => {
-          deleteObject(itemRef)
-            .then(() => {
-              console.log("storge 에서 삭제");
-            })
-            .catch((error) => {
-              console.log("storage 삭제 실패 : ", error);
-            });
-        });
-      })
-      .catch((error) => {
-        console.log(error);
       });
   }, [groupId]);
 
