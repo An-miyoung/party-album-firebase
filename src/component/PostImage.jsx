@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { db } from "../firebase";
 import { onValue, ref } from "firebase/database";
 import { ImageList, ImageListItem, ImageListItemBar } from "@mui/material";
@@ -6,13 +6,30 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { groupIdState } from "../store/groupId";
-import { groupImageState } from "../store/groupImage";
 import { DeleteModal } from "./modal/DeleteModal";
+import { groupImageState } from "../store/groupImage";
 
 const PostImages = () => {
   const isMobile = useMediaQuery("(max-width: 600px)");
   const groupId = useRecoilValue(groupIdState);
   const [imgData, setImgData] = useState([]);
+  const [groupImage, setGroupImage] = useRecoilState(groupImageState);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const handleDelete = useCallback(
+    (imageId, downloadUrl) => {
+      setGroupImage({
+        imageId: imageId,
+        downloadUrl: downloadUrl,
+      });
+      setShowDeleteModal(true);
+    },
+    [setGroupImage]
+  );
+
+  const handleShowDeleteModal = useCallback(() => {
+    setShowDeleteModal(false);
+  }, []);
 
   useEffect(() => {
     setImgData([]);
@@ -55,7 +72,9 @@ const PostImages = () => {
                 position: "absolute",
                 bottom: "7vh",
                 right: 0,
+                cursor: "pointer",
               }}
+              onClick={() => handleDelete(item.imageId, item.img)}
             />
 
             <ImageListItemBar
@@ -66,6 +85,12 @@ const PostImages = () => {
           </ImageListItem>
         ))}
       </ImageList>
+      <DeleteModal
+        open={showDeleteModal}
+        handleClose={handleShowDeleteModal}
+        groupId={groupId}
+        action="thisImageOnly"
+      />
 
       <>{console.log(imgData)}</>
     </>

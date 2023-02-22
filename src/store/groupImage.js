@@ -2,5 +2,8 @@ import { atom } from "recoil";
 
 export const groupImageState = atom({
   key: "groupImage",
-  default: "",
+  default: {
+    imageId: null,
+    downloadUrl: "",
+  },
 });

@@ -4,9 +4,13 @@ import { db, storage } from "../../firebase";
 import { ref, remove } from "firebase/database";
 import { ref as refStorage, listAll, deleteObject } from "firebase/storage";
 import { imgSrcTranslator } from "../../utils/imgSrcTranslator";
+import { useRecoilValue } from "recoil";
+import { groupImageState } from "../../store/groupImage";
 
 export const DeleteModal = ({ open, handleClose, groupId, action }) => {
-  console.log(groupId);
+  console.log("groupId : ", groupId);
+  const groupImage = useRecoilValue(groupImageState);
+
   const title =
     action === "groupsAll"
       ? "정말로 이 앨범을 삭제하시겠습니까?"
@@ -51,8 +55,31 @@ export const DeleteModal = ({ open, handleClose, groupId, action }) => {
   }, [deleteToData, handleClose]);
 
   const thisImageOnlyDelete = useCallback(() => {
+    console.log("downloadUrl : ", groupImage.downloadUrl);
+    const imageRef = ref(
+      db,
+      "groups/" + groupId + "/postImages/" + groupImage.imageId
+    );
+
+    const imgSrc = imgSrcTranslator(groupImage.downloadUrl);
+
+    const imgStorageRef = refStorage(storage, imgSrc);
+
+    remove(imageRef)
+      .then(() => {
+        console.log("delete");
+
+        deleteObject(imgStorageRef)
+          .then(() => console.log("storage 삭제"))
+          .catch((error) => {
+            console.log(error);
+          });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
     handleClose();
-  }, [handleClose]);
+  }, [groupId, groupImage.downloadUrl, groupImage.imageId, handleClose]);
 
   return (
     <Dialog open={open} onClose={handleClose}>

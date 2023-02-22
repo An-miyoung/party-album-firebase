@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { db, storage } from "../../firebase";
-import { push, ref, serverTimestamp, set } from "firebase/database";
+import { push, ref, serverTimestamp, set, update } from "firebase/database";
 import {
   ref as refStorage,
   uploadBytesResumable,
@@ -41,7 +41,7 @@ function ImageModal({ open, handleClose, setPercent }) {
   }, []);
 
   const createImageMessage = useCallback(
-    (fileUrl) => ({
+    (imageId, fileUrl) => ({
       timestamp: serverTimestamp(),
       user: {
         id: groupId,
@@ -49,6 +49,7 @@ function ImageModal({ open, handleClose, setPercent }) {
         // name: user.currentUser.displayName,
         // avatar: user.currentUser.photoURL,
       },
+      imageId,
       img: fileUrl,
       title,
     }),
@@ -83,10 +84,12 @@ function ImageModal({ open, handleClose, setPercent }) {
           const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
 
           // firebase db로 저장한다.
-          await set(
-            push(ref(db, `groups/${groupId}/postImages/`)),
-            createImageMessage(downloadUrl)
-          );
+          const updates = {};
+          const imageId = uid();
+          updates["/groups/" + groupId + "/postImages/" + imageId] =
+            createImageMessage(imageId, downloadUrl);
+          await update(ref(db), updates);
+
           unsubscribe();
         } catch (error) {
           console.error(error);
