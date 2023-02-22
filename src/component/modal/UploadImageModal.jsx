@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { db, storage } from "../../firebase";
-import { push, ref, serverTimestamp, set, update } from "firebase/database";
+import { ref, serverTimestamp, update } from "firebase/database";
 import {
   ref as refStorage,
   uploadBytesResumable,

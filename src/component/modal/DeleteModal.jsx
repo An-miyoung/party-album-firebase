@@ -8,7 +8,7 @@ import { useRecoilValue } from "recoil";
 import { groupImageState } from "../../store/groupImage";
 
 export const DeleteModal = ({ open, handleClose, groupId, action }) => {
-  const groupImage = useRecoilValue(groupImageState);
+  const { imageId, downloadUrl } = useRecoilValue(groupImageState);
 
   const title =
     action === "groupsAll"
@@ -19,60 +19,52 @@ export const DeleteModal = ({ open, handleClose, groupId, action }) => {
     handleClose();
   }, [handleClose]);
 
-  const deleteToData = useCallback(() => {
-    const groupsRef = ref(db, "groups/" + groupId);
-    const deleteRef = refStorage(storage, "postImages/" + groupId);
-
-    remove(groupsRef)
-      .then(() => {
-        // storage 내부를 재귀하며 이미지 파일 삭제
-        listAll(deleteRef)
-          .then((res) => {
-            res.items.forEach((itemRef) => {
-              deleteObject(itemRef)
-                .then(() => {})
-                .catch((error) => {
-                  console.log("storage  삭제 실패 : ", error);
+  const deleteToData = useCallback(
+    (realtimeRef, storageRef) => {
+      remove(realtimeRef)
+        .then(() => {
+          action === "groupsAll" &&
+            // 앨범전체를 삭제할 경우, storage 내부를 재귀하며 이미지 파일 삭제
+            listAll(storageRef)
+              .then((res) => {
+                res.items.forEach((itemRef) => {
+                  deleteObject(itemRef);
                 });
-            });
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      })
-      .catch((error) => {
-        console.log("realTime database 삭제 실패 : ", error);
-      });
-  }, [groupId]);
+              })
+              .catch((error) => {
+                console.log("storage 에서 삭제 실패", error);
+              });
+          // 특정 이미지 하나를 지울때
+          action === "thisImageOnly" &&
+            deleteObject(storageRef)
+              .then(() => {})
+              .catch((error) => {
+                console.log("storage 에서 삭제 실패", error);
+              });
+        })
+        .catch((error) => {
+          console.log("realTime database 삭제 실패 : ", error);
+        });
+    },
+    [action]
+  );
 
   const groupsAllDelete = useCallback(() => {
-    deleteToData();
+    deleteToData(
+      ref(db, "groups/" + groupId),
+      refStorage(storage, "postImages/" + groupId)
+    );
     handleClose();
-  }, [deleteToData, handleClose]);
+  }, [deleteToData, groupId, handleClose]);
 
   const thisImageOnlyDelete = useCallback(() => {
-    const imageRef = ref(
-      db,
-      "groups/" + groupId + "/postImages/" + groupImage.imageId
+    const imgSrc = imgSrcTranslator(downloadUrl);
+    deleteToData(
+      ref(db, "groups/" + groupId + "/postImages/" + imageId),
+      refStorage(storage, imgSrc)
     );
-    const imgSrc = imgSrcTranslator(groupImage.downloadUrl);
-    const deleteRef = refStorage(storage, imgSrc);
-
-    remove(imageRef)
-      .then(() => {
-        console.log("delete");
-
-        deleteObject(deleteRef)
-          .then(() => {})
-          .catch((error) => {
-            console.log("storage 에서 ", imgSrc, " 삭제 실패", error);
-          });
-      })
-      .catch((error) => {
-        console.log("realtime 삭제 실패", error);
-      });
     handleClose();
-  }, [groupId, groupImage.downloadUrl, groupImage.imageId, handleClose]);
+  }, [deleteToData, downloadUrl, groupId, handleClose, imageId]);
 
   return (
     <Dialog open={open} onClose={handleClose}>
