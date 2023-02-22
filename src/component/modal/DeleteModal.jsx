@@ -8,7 +8,6 @@ import { useRecoilValue } from "recoil";
 import { groupImageState } from "../../store/groupImage";
 
 export const DeleteModal = ({ open, handleClose, groupId, action }) => {
-  console.log("groupId : ", groupId);
   const groupImage = useRecoilValue(groupImageState);
 
   const title =
@@ -26,17 +25,14 @@ export const DeleteModal = ({ open, handleClose, groupId, action }) => {
 
     remove(groupsRef)
       .then(() => {
-        console.log("realtime삭제");
-
+        // storage 내부를 재귀하며 이미지 파일 삭제
         listAll(deleteRef)
           .then((res) => {
             res.items.forEach((itemRef) => {
               deleteObject(itemRef)
-                .then(() => {
-                  console.log("storge 에서 삭제");
-                })
+                .then(() => {})
                 .catch((error) => {
-                  console.log("storage 삭제 실패 : ", error);
+                  console.log("storage  삭제 실패 : ", error);
                 });
             });
           })
@@ -55,28 +51,25 @@ export const DeleteModal = ({ open, handleClose, groupId, action }) => {
   }, [deleteToData, handleClose]);
 
   const thisImageOnlyDelete = useCallback(() => {
-    console.log("downloadUrl : ", groupImage.downloadUrl);
     const imageRef = ref(
       db,
       "groups/" + groupId + "/postImages/" + groupImage.imageId
     );
-
     const imgSrc = imgSrcTranslator(groupImage.downloadUrl);
-
-    const imgStorageRef = refStorage(storage, imgSrc);
+    const deleteRef = refStorage(storage, imgSrc);
 
     remove(imageRef)
       .then(() => {
         console.log("delete");
 
-        deleteObject(imgStorageRef)
-          .then(() => console.log("storage 삭제"))
+        deleteObject(deleteRef)
+          .then(() => {})
           .catch((error) => {
-            console.log(error);
+            console.log("storage 에서 ", imgSrc, " 삭제 실패", error);
           });
       })
       .catch((error) => {
-        console.log(error);
+        console.log("realtime 삭제 실패", error);
       });
     handleClose();
   }, [groupId, groupImage.downloadUrl, groupImage.imageId, handleClose]);
