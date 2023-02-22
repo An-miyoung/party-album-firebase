@@ -138,7 +138,9 @@ const Post = () => {
           paddingLeft: "5vw",
           display: "flex",
           flexDirection: "row",
-          justifyContent: "space-between",
+          justifyContent: "space-evenly",
+          flexWrap: "wrap",
+          alignItems: "baseline",
         }}
       >
         <Button variant="outlined" onClick={handleOpenMenu}>
@@ -148,6 +150,7 @@ const Post = () => {
             {groupName}
           </Typography>
         </Button>
+        <div style={{ width: "5px" }} />
         {isMobile ? (
           <Typography
             component="div"
@@ -156,7 +159,6 @@ const Post = () => {
               color: "#403234",
               verticalAlign: "super",
               paddingRight: "5vw",
-              width: "30vw",
               overflowWrap: "break-word",
               wordBreak: "keep-all",
             }}
@@ -167,6 +169,7 @@ const Post = () => {
                 fontSize: "5vw",
                 color: "#403234",
                 marginRight: "1vw",
+                verticalAlign: "sub",
               }}
             />{" "}
             {groupMembersString}

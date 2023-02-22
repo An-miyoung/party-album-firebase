@@ -1,36 +1,5 @@
-// import React from "react";
-// import { useRecoilValue } from "recoil";
-// import { groupDataState } from "../store/groupData";
-// import useGroupData from "../hooks/useGroupData";
-// import GroupListContainer from "../component/GroupListContainer";
-// import Header from "../component/Header";
-// import CreateGroup from "../component/CreateGroup";
-// import { StyleContainer } from "../component/GroupListContainer";
-
-// const GroupList = () => {
-//   useGroupData();
-//   const groupData = useRecoilValue(groupDataState);
-
-//   return (
-//     <>
-//       {groupData !== undefined && groupData !== null && groupData.length > 0 ? (
-//         <GroupListContainer />
-//       ) : (
-//         <StyleContainer>
-//           <Header />
-//           <CreateGroup />
-//         </StyleContainer>
-//       )}
-//     </>
-//   );
-// };
-
-// export default GroupList;
-
 import React, { useState, useCallback } from "react";
 import { Link } from "react-router-dom";
-// import { ref, remove } from "firebase/database";
-// import { db } from "../firebase";
 import styled from "styled-components";
 import Header from "../component/Header";
 import CreateGroup from "../component/CreateGroup";
@@ -45,11 +14,8 @@ import { groupDataState } from "../store/groupData";
 const GroupsList = () => {
   useGroupData();
   const groupData = useRecoilValue(groupDataState);
-
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  // const [confirmDelete, setConfirmDelete] = useState(false);
-
   const [pickedGroupId, setPickedGroupId] = useRecoilState(groupIdState);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const handleDelete = (groupId) => {
     setPickedGroupId(groupId ? groupId : null);
@@ -59,17 +25,6 @@ const GroupsList = () => {
   const handleShowDeleteModal = useCallback(() => {
     setShowDeleteModal(false);
   }, []);
-
-  // const deleteToData = useCallback(() => {
-  //   const groupsRef = ref(db, "groups/" + pickedGroupId);
-
-  //   confirmDelete &&
-  //     remove(groupsRef).then(() => {
-  //       setConfirmDelete(false);
-  //     });
-  // }, [confirmDelete, pickedGroupId]);
-
-  // deleteToData();
 
   return (
     <StyleContainer>
@@ -98,6 +53,7 @@ const GroupsList = () => {
         open={showDeleteModal}
         handleClose={handleShowDeleteModal}
         groupId={pickedGroupId}
+        action="groupsAll"
       />
     </StyleContainer>
   );

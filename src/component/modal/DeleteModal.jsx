@@ -3,8 +3,15 @@ import { Button, Dialog, DialogActions, DialogTitle } from "@mui/material";
 import { db, storage } from "../../firebase";
 import { ref, remove } from "firebase/database";
 import { ref as refStorage, listAll, deleteObject } from "firebase/storage";
+import { imgSrcTranslator } from "../../utils/imgSrcTranslator";
 
-export const DeleteModal = ({ open, handleClose, groupId }) => {
+export const DeleteModal = ({ open, handleClose, groupId, action }) => {
+  console.log(groupId);
+  const title =
+    action === "groupsAll"
+      ? "정말로 이 앨범을 삭제하시겠습니까?"
+      : "정말로 이 이미지를 삭제하시겠습니까?";
+
   const closeModal = useCallback(() => {
     handleClose();
   }, [handleClose]);
@@ -38,17 +45,27 @@ export const DeleteModal = ({ open, handleClose, groupId }) => {
       });
   }, [groupId]);
 
-  const groupDataDelete = useCallback(() => {
+  const groupsAllDelete = useCallback(() => {
     deleteToData();
     handleClose();
   }, [deleteToData, handleClose]);
 
+  const thisImageOnlyDelete = useCallback(() => {
+    handleClose();
+  }, [handleClose]);
+
   return (
     <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>{`정말로 앨범을 삭제하시겠습니까?`}</DialogTitle>
+      <DialogTitle>{title}</DialogTitle>
       <DialogActions>
         <Button onClick={closeModal}>취소</Button>
-        <Button onClick={groupDataDelete}>삭제</Button>
+        <Button
+          onClick={
+            action === "groupsAll" ? groupsAllDelete : thisImageOnlyDelete
+          }
+        >
+          삭제
+        </Button>
       </DialogActions>
     </Dialog>
   );
