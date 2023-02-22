@@ -1,5 +1,6 @@
 export const ROUTES = {
   JOIN: "/join",
+  LOGIN: "/login",
   SHOW_POST_DETAIL: "/groups/:guid/post",
   GROUPS_LIST: "/groups",
 };

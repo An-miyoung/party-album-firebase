@@ -6,12 +6,18 @@ import {
   Typography,
   Grid,
   TextField,
-  Alert,
+  Button,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { Link } from "react-router-dom";
 import { auth, db } from "../firebase";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  onAuthStateChanged,
+  signOut,
+} from "firebase/auth";
 import { ref, set } from "firebase/database";
 import md5 from "md5";
 import { useRecoilState } from "recoil";
@@ -27,9 +33,7 @@ const IsPasswordValid = (password, confirmPassword) => {
   }
 };
 
-function Join() {
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+function TestJoin() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,75 +43,72 @@ function Join() {
   const handleNameChange = useCallback((e) => {
     setName(e.target.value);
   }, []);
-
   const handleEmailChange = useCallback((e) => {
     setEmail(e.target.value);
   }, []);
-
   const handlePasswordChange = useCallback((e) => {
     setPassword(e.target.value);
   }, []);
-
   const handleConfirmPasswordChange = useCallback((e) => {
     setConfirmPassword(e.target.value);
   }, []);
 
-  const postUserData = useCallback(
-    async (name, email, password) => {
-      setLoading(true);
-      try {
-        // firebase 명령어를 이용해 사용자개정을 만든다. 즉시 로그인 상태로 바뀐다.
-        const { user } = await createUserWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
-        await updateProfile(user, {
-          displayName: name,
-          photoURL: `https://www.gravatar.com/avatar/${md5(email)}?d=retro`,
-        });
+  const loginEmailPassword = async () => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      console.log(userCredential);
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  const createAccount = async () => {
+    try {
+      const { user } = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      await updateProfile(user, {
+        displayName: name,
+        photoURL: `https://www.gravatar.com/avatar/${md5(email)}?d=retro`,
+      });
+
+      console.log(user);
+      setCurrentUser({
+        displayName: name,
+        photoURL: `https://www.gravatar.com/avatar/${md5(email)}?d=retro`,
+      });
+
+      await set(ref(db, "users/" + user.uid), {
+        name: user.displayName,
+        avatar: user.photoURL,
+      });
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  const monitorAuthState = async () => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
         console.log(user);
-        // displayName 과 photoUrl 이 만들어진 후 frontend  내 보관
-        setCurrentUser({ uid: user.uid });
-
-        // email, password 는 auth 에서 관리
-        // displayName, photoUrl 은 userProfile 에서 관리
-        // 동일한 내용을 name, avatar로  realtimeDatabase 에서 관리
-        await set(ref(db, "users/" + user.uid), {
-          name: user.displayName,
-          avatar: user.photoURL,
-        });
-        setLoading(false);
-      } catch (error) {
-        setError(error.message);
-        setLoading(false);
+      } else {
+        console.log("logout");
       }
-    },
-    [setCurrentUser]
-  );
+    });
+  };
 
-  const handleSubmit = useCallback(
-    (event) => {
-      event.preventDefault();
+  monitorAuthState();
 
-      if (!name || !email || !password || !confirmPassword) {
-        setError("모든 항목을 입력해주세요.");
-        return;
-      }
-
-      if (!IsPasswordValid(password, confirmPassword)) {
-        setError("비밀번호가 다릅니다. 확인후 다시 입력해 주세요");
-        return;
-      }
-      postUserData(name, email, password);
-    },
-    [confirmPassword, email, name, password, postUserData]
-  );
-
-  useEffect(() => {
-    if (!error) return;
-    setTimeout(() => {}, 3000);
-  }, [error]);
+  const logout = async () => {
+    await signOut(auth);
+  };
 
   return (
     <Container component="main" maxWidth="xs" sx={{ paddingTop: "10vh" }}>
@@ -123,7 +124,7 @@ function Join() {
         <Typography component="h1" variant="h5">
           회원가입
         </Typography>
-        <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+        <Box component="form" noValidate sx={{ mt: 3 }}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
@@ -155,7 +156,7 @@ function Join() {
                 onChange={handlePasswordChange}
               />
             </Grid>
-            <Grid item xs={12}>
+            {/* <Grid item xs={12}>
               <TextField
                 name="confirmPassword"
                 required
@@ -164,37 +165,31 @@ function Join() {
                 type="password"
                 onChange={handleConfirmPasswordChange}
               />
-            </Grid>
+            </Grid> */}
           </Grid>
-          {error && (
-            <Alert sx={{ mt: 3 }} severity="error">
-              {error}
-            </Alert>
-          )}
-          <LoadingButton
+
+          {/* <LoadingButton
             type="submit"
             fullWidth
             variant="contained"
             color="secondary"
             sx={{ mt: 3, mb: 2 }}
-            loading={loading}
           >
             회원가입
-          </LoadingButton>
+          </LoadingButton> */}
           <Grid container justifyContent="flex-end">
             <Grid item>
-              <Link
-                to="/login"
-                style={{ textDecoration: "none", color: "blue" }}
-              >
-                이미 계정이 있나요? 로그인으로 이동
-              </Link>
+              이미 계정이 있나요? 로그인으로 이동
+              <Button onClick={loginEmailPassword}>로그인</Button>
+              <Button onClick={createAccount}>회원가입</Button>
+              <Button onClick={logout}>로그아웃</Button>
             </Grid>
           </Grid>
         </Box>
       </Box>
+      {Object.keys(currentUser).length > 0 && console.log(currentUser)}
     </Container>
   );
 }
 
-export default Join;
+export default TestJoin;

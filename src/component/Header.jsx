@@ -9,12 +9,15 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
-// import "../firebase";
-// import { signOut, getAuth } from "firebase/auth";
+import { auth } from "../firebase";
+import { signOut } from "firebase/auth";
+import { useRecoilValue } from "recoil";
+import { currentUserState } from "../store/user";
 
 function Header() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const currentUser = useRecoilValue(currentUserState);
 
   const handleOpenMenu = useCallback((event) => {
     setAnchorEl(event.currentTarget);
@@ -31,6 +34,11 @@ function Header() {
   // const handleProfileModalClose = useCallback(() => {
   //   setShowProfileModal(false);
   // }, []);
+  const handleLogout = useCallback(async () => {
+    console.log(currentUser);
+    await signOut(auth);
+    // App.js 내부 onAuthStateChanged 함수를 이용해 로그아웃 처리를 해준다.
+  }, [currentUser]);
 
   return (
     <>
@@ -73,7 +81,7 @@ function Header() {
               <MenuItem onClick={handleProfileModalOpen}>
                 <Typography textAlign="center">프로필이미지</Typography>
               </MenuItem>
-              <MenuItem>
+              <MenuItem onClick={handleLogout}>
                 <Typography textAlign="center">Logout</Typography>
               </MenuItem>
             </Menu>
