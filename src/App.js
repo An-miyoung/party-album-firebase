@@ -9,7 +9,6 @@ import Login from "./pages/Login";
 import GroupsList from "./pages/GroupsList";
 import Post from "./pages/Post";
 import NotFound from "./pages/NotFound";
-import TestJoin from "./pages/TestJoin";
 import { useRecoilState } from "recoil";
 import { currentUserState } from "./store/user";
 
@@ -50,7 +49,6 @@ function App() {
             )
           }
         />
-        <Route path="/testJoin" element={<TestJoin />} />
         <Route
           path={ROUTES.JOIN}
           element={
@@ -64,7 +62,12 @@ function App() {
           }
         />
         <Route path={ROUTES.SHOW_POST_DETAIL} element={<Post />} />
-        <Route path={ROUTES.GROUPS_LIST} element={<GroupsList />} />
+        <Route
+          path={ROUTES.GROUPS_LIST}
+          element={
+            isCurrentUser ? <GroupsList /> : <Navigate to={ROUTES.LOGIN} />
+          }
+        />
         <Route path="/*" element={<NotFound />} />
       </Routes>
     </div>

@@ -15,7 +15,7 @@ import { currentUserState } from "../../store/user";
 import { groupNameState } from "../../store/groupName";
 
 const GroupNameModal = ({ open, handleClose, action, guid }) => {
-  const { userId, displayName, photoURL } = useRecoilValue(currentUserState);
+  const { userId, displayName } = useRecoilValue(currentUserState);
   console.log(userId, "/", displayName);
   const [groupName, setGroupName] = useRecoilState(groupNameState);
   const title =
@@ -32,15 +32,10 @@ const GroupNameModal = ({ open, handleClose, action, guid }) => {
     const guid = uid();
     set(ref(db, `groups/${userId}/${guid}`), {
       timestamp: serverTimestamp(),
-      user: {
-        userId,
-        name: displayName,
-        avatar: photoURL,
-      },
       groupId: guid,
       groupName,
     });
-  }, [displayName, groupName, photoURL, userId]);
+  }, [groupName, userId]);
 
   const updateToDatabase = useCallback(async () => {
     if (guid !== undefined && guid.length > 0) {
