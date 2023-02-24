@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
-import { db, storage } from "../../firebase";
+import { auth, db, storage } from "../../firebase";
 import {
   getDownloadURL,
   ref as refStorage,
@@ -17,11 +17,11 @@ import {
 } from "@mui/material";
 import { Stack } from "@mui/system";
 import AvatarEditor from "react-avatar-editor";
-import { useRecoilValue } from "recoil";
+import { useRecoilState } from "recoil";
 import { currentUserState } from "../../store/user";
 
 function ProfileModal({ open, handleClose }) {
-  const { uid } = useRecoilValue(currentUserState);
+  const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
   const [previewImage, setPreviewImage] = useState("");
   const [croppedImage, setCroppedImage] = useState("");
   const [uploadedImage, setUploadedImage] = useState("");
@@ -55,32 +55,37 @@ function ProfileModal({ open, handleClose }) {
   }, []);
 
   const uploadCroppedImage = useCallback(async () => {
-    if (!uid) return;
+    if (!currentUser.uid) return;
 
     // firebase storae 에 주소를 만들어주고
-    const storageRef = refStorage(storage, `avatars/users/${uid}`);
+    const storageRef = refStorage(storage, `avatars/users/${currentUser.uid}`);
     const uploadTask = await uploadBytes(storageRef, blob);
-    // 채팅화면에서 이미지를 저장하고 downloadUrl을 만들때는 uploadTask.snapshot.ref 였음.
     const downloadUrl = await getDownloadURL(uploadTask.ref);
     setUploadedImage(downloadUrl);
-  }, [blob, uid]);
+  }, [blob, currentUser.uid]);
 
-  // useEffect(() => {
-  //   if (!uploadedImage || !uid) return;
+  useEffect(() => {
+    if (!uploadedImage || !currentUser.uid) return;
 
-  //   // firebase auth 의 메소드를 사용해 update
-  //   async function changeAvatar() {
-  //     await updateProfile(user.currentUser, { photoURL: uploadedImage });
+    // firebase auth 의 메소드를 사용해 update
+    async function changeAvatar() {
+      await updateProfile(auth.currentUser, { photoURL: uploadedImage });
 
-  //     // firebase db 에 저장
-  //     const updates = {};
-  //     updates["/users/" + user.currentUser.uid + "/avatar"] = uploadedImage;
-  //     await update(ref(getDatabase()), updates);
-  //     closeModal();
-  //   }
+      // firebase db 에 저장
+      const updates = {};
+      updates["/users/" + currentUser.uid + "/avatar"] = uploadedImage;
+      await update(ref(db), updates);
 
-  //   changeAvatar();
-  // }, [uploadedImage, user.currentUser, closeModal]);
+      setCurrentUser({
+        uid: currentUser.uid,
+        displayName: currentUser.displayName,
+        photoURL: uploadedImage,
+      });
+      closeModal();
+    }
+
+    changeAvatar();
+  }, [uploadedImage, closeModal, currentUser, setCurrentUser]);
 
   return (
     <Dialog open={open} onClose={closeModal}>

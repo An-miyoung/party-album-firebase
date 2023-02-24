@@ -13,6 +13,7 @@ import { auth } from "../firebase";
 import { signOut } from "firebase/auth";
 import { useRecoilValue } from "recoil";
 import { currentUserState } from "../store/user";
+import ProfileModal from "./modal/ProfileModal";
 
 function Header() {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -31,9 +32,10 @@ function Header() {
     handleCloseMenu();
   }, [handleCloseMenu]);
 
-  // const handleProfileModalClose = useCallback(() => {
-  //   setShowProfileModal(false);
-  // }, []);
+  const handleProfileModalClose = useCallback(() => {
+    setShowProfileModal(false);
+  }, []);
+
   const handleLogout = useCallback(async () => {
     console.log(currentUser);
     await signOut(auth);
@@ -90,6 +92,10 @@ function Header() {
           </Box>
         </Toolbar>
       </AppBar>
+      <ProfileModal
+        open={showProfileModal}
+        handleClose={handleProfileModalClose}
+      />
     </>
   );
 }
