@@ -10,10 +10,13 @@ import {
   DialogTitle,
   Input,
 } from "@mui/material";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { currentUserState } from "../../store/user";
 import { groupNameState } from "../../store/groupName";
 
 const GroupNameModal = ({ open, handleClose, action, guid }) => {
+  const { userId, displayName, photoURL } = useRecoilValue(currentUserState);
+  console.log(userId, "/", displayName);
   const [groupName, setGroupName] = useRecoilState(groupNameState);
   const title =
     action === "createName"
@@ -27,21 +30,26 @@ const GroupNameModal = ({ open, handleClose, action, guid }) => {
 
   const createToDatabase = useCallback(() => {
     const guid = uid();
-    set(ref(db, "groups/" + guid), {
+    set(ref(db, `groups/${userId}/${guid}`), {
       timestamp: serverTimestamp(),
+      user: {
+        userId,
+        name: displayName,
+        avatar: photoURL,
+      },
       groupId: guid,
       groupName,
     });
-  }, [groupName]);
+  }, [displayName, groupName, photoURL, userId]);
 
   const updateToDatabase = useCallback(async () => {
     if (guid !== undefined && guid.length > 0) {
       const updates = {};
       const newGroupName = groupName;
-      updates["groups/" + guid + "/groupName"] = newGroupName;
+      updates[`groups/${userId}/${guid}/groupName`] = newGroupName;
       await update(ref(db), updates);
     }
-  }, [groupName, guid]);
+  }, [groupName, guid, userId]);
 
   const handleInputComplete = useCallback(() => {
     if (groupName.length > 0) {

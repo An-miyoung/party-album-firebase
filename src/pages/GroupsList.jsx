@@ -10,9 +10,11 @@ import { DeleteModal } from "../component/modal/DeleteModal";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { groupIdState } from "../store/groupId";
 import { groupDataState } from "../store/groupData";
+import { currentUserState } from "../store/user";
 
 const GroupsList = () => {
   useGroupData();
+  const { userId } = useRecoilValue(currentUserState);
   const groupData = useRecoilValue(groupDataState);
   const [pickedGroupId, setPickedGroupId] = useRecoilState(groupIdState);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -31,7 +33,8 @@ const GroupsList = () => {
       <Header />
       <CreateGroup />
       <StyleCardContainer>
-        {groupData?.length > 0 &&
+        {userId !== null &&
+          groupData?.length > 0 &&
           groupData.map(({ groupId, groupName, members }, idx) => (
             <StyleCardItem key={`${groupId}-${idx}`}>
               <Link

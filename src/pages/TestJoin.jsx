@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import {
   Container,
   Box,
@@ -8,8 +8,6 @@ import {
   TextField,
   Button,
 } from "@mui/material";
-import { LoadingButton } from "@mui/lab";
-import { Link } from "react-router-dom";
 import { auth, db } from "../firebase";
 import {
   signInWithEmailAndPassword,
@@ -23,21 +21,10 @@ import md5 from "md5";
 import { useRecoilState } from "recoil";
 import { currentUserState } from "../store/user";
 
-const IsPasswordValid = (password, confirmPassword) => {
-  if (password.length < 6 || confirmPassword.length < 6) {
-    return false;
-  } else if (password !== confirmPassword) {
-    return false;
-  } else {
-    return true;
-  }
-};
-
 function TestJoin() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
 
   const handleNameChange = useCallback((e) => {
@@ -48,9 +35,6 @@ function TestJoin() {
   }, []);
   const handlePasswordChange = useCallback((e) => {
     setPassword(e.target.value);
-  }, []);
-  const handleConfirmPasswordChange = useCallback((e) => {
-    setConfirmPassword(e.target.value);
   }, []);
 
   const loginEmailPassword = async () => {
@@ -156,27 +140,7 @@ function TestJoin() {
                 onChange={handlePasswordChange}
               />
             </Grid>
-            {/* <Grid item xs={12}>
-              <TextField
-                name="confirmPassword"
-                required
-                fullWidth
-                label="비밀번호확인"
-                type="password"
-                onChange={handleConfirmPasswordChange}
-              />
-            </Grid> */}
           </Grid>
-
-          {/* <LoadingButton
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="secondary"
-            sx={{ mt: 3, mb: 2 }}
-          >
-            회원가입
-          </LoadingButton> */}
           <Grid container justifyContent="flex-end">
             <Grid item>
               이미 계정이 있나요? 로그인으로 이동

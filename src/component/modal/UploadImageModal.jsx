@@ -17,9 +17,11 @@ import {
   Typography,
 } from "@mui/material";
 import { useRecoilValue } from "recoil";
+import { currentUserState } from "../../store/user";
 import { groupIdState } from "../../store/groupId";
 
 function ImageModal({ open, handleClose, setPercent }) {
+  const { userId } = useRecoilValue(currentUserState);
   const groupId = useRecoilValue(groupIdState);
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState("");
@@ -43,22 +45,16 @@ function ImageModal({ open, handleClose, setPercent }) {
   const createImageMessage = useCallback(
     (imageId, fileUrl) => ({
       timestamp: serverTimestamp(),
-      user: {
-        id: groupId,
-        // id: user.currentUser.uid,
-        // name: user.currentUser.displayName,
-        // avatar: user.currentUser.photoURL,
-      },
       imageId,
       img: fileUrl,
       title,
     }),
-    [groupId, title]
+    [title]
   );
 
   const uploadFile = useCallback(() => {
     // pop으로 마지막 요소인 확장자를 제거하고 이름만으로 uuid 를 만든다.
-    const filePath = `postImages/${groupId}/${uid()}.${file.name
+    const filePath = `postImages/${userId}/${groupId}/${uid()}.${file.name
       .split(".")
       .pop()}`;
 
@@ -86,7 +82,7 @@ function ImageModal({ open, handleClose, setPercent }) {
           // firebase db로 저장한다.
           const updates = {};
           const imageId = uid();
-          updates["/groups/" + groupId + "/postImages/" + imageId] =
+          updates[`groups/${userId}/${groupId}/postImages/${imageId}`] =
             createImageMessage(imageId, downloadUrl);
           await update(ref(db), updates);
 
@@ -97,7 +93,7 @@ function ImageModal({ open, handleClose, setPercent }) {
         }
       }
     );
-  }, [createImageMessage, file, groupId, setPercent]);
+  }, [createImageMessage, file, groupId, setPercent, userId]);
 
   const handleSendFile = useCallback(() => {
     uploadFile();

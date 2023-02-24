@@ -15,11 +15,13 @@ import PostImage from "../component/PostImage";
 import GroupNameModal from "../component/modal/GroupNameModal";
 import AddMembersModal from "../component/modal/AddMembersModal";
 import UploadImageModal from "../component/modal/UploadImageModal";
+import { currentUserState } from "../store/user";
 import { groupIdState } from "../store/groupId";
 import { groupNameState } from "../store/groupName";
 
 const Post = () => {
   const { guid } = useParams();
+  const { userId } = useRecoilValue(currentUserState);
   const setGroupId = useSetRecoilState(groupIdState);
   const [groupName, setGroupName] = useRecoilState(groupNameState);
   const [groupMembers, setGroupMembers] = useRecoilState(groupMembersState);
@@ -37,7 +39,7 @@ const Post = () => {
 
   const fetchPostData = useCallback(() => {
     const dbRef = ref(db);
-    get(child(dbRef, `groups/${guid}`))
+    get(child(dbRef, `groups/${userId}/${guid}`))
       .then((snapshot) => {
         if (snapshot.exists()) {
           const { groupId, groupName, groupMembers } = snapshot.val();
@@ -52,7 +54,7 @@ const Post = () => {
       .catch((error) => {
         console.log(error);
       });
-  }, [guid, setGroupId, setGroupMembers, setGroupName]);
+  }, [guid, setGroupId, setGroupMembers, setGroupName, userId]);
 
   useEffect(() => {
     if (pickedGroupData?.length > 0) {
@@ -99,7 +101,8 @@ const Post = () => {
     setGroupMembers(groupMembers);
     setMembers([]);
     setShowGroupMembersModal(true);
-  }, [groupMembers, setGroupMembers]);
+    handleCloseMenu();
+  }, [groupMembers, handleCloseMenu, setGroupMembers]);
   // 사진 입력
   const handleUploadImageModalClose = useCallback(() => {
     setShowUploadImageModal(false);
@@ -107,7 +110,8 @@ const Post = () => {
   }, [handleCloseMenu]);
   const handelShowUploadImageModal = useCallback(() => {
     setShowUploadImageModal(true);
-  }, []);
+    handleCloseMenu();
+  }, [handleCloseMenu]);
   // 그룹명 변경
   const handleGroupNameModalClose = useCallback(() => {
     setShowGroupNameModal(false);
@@ -115,16 +119,17 @@ const Post = () => {
   }, [handleCloseMenu]);
   const handleShowGroupNameModal = useCallback(() => {
     setShowGroupNameModal(true);
-  }, []);
+    handleCloseMenu();
+  }, [handleCloseMenu]);
 
   //  member 는 한 단어가 아니라 배열을 받아들여야 해 그 처리를 modal 안에서 할 수 없다.
   // setValue 후 상태값이 변하는 useEffect 가 일어나기 전에 value 를 읽게 돼서 불가피하게 부모에서 저장처리함.
   const writeToDatabase = useCallback(async () => {
     const updates = {};
     const newMembers = groupMembers?.concat(members) || members;
-    updates["/groups/" + guid + "/groupMembers"] = newMembers;
+    updates[`/groups/${userId}/${guid}/groupMembers`] = newMembers;
     await update(ref(db), updates);
-  }, [groupMembers, guid, members]);
+  }, [groupMembers, guid, members, userId]);
 
   const handleNameString = useCallback(() => {
     writeToDatabase();

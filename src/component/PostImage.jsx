@@ -5,12 +5,14 @@ import { ImageList, ImageListItem, ImageListItemBar } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useSetRecoilState, useRecoilValue } from "recoil";
+import { currentUserState } from "../store/user";
 import { groupIdState } from "../store/groupId";
 import { DeleteModal } from "./modal/DeleteModal";
 import { groupImageState } from "../store/groupImage";
 
 const PostImages = () => {
   const isMobile = useMediaQuery("(max-width: 600px)");
+  const { userId } = useRecoilValue(currentUserState);
   const groupId = useRecoilValue(groupIdState);
   const [imgData, setImgData] = useState([]);
   const setGroupImage = useSetRecoilState(groupImageState);
@@ -35,7 +37,7 @@ const PostImages = () => {
     setImgData([]);
 
     const getImages = () => {
-      const imageRef = ref(db, `groups/${groupId}/postImages/`);
+      const imageRef = ref(db, `groups/${userId}/${groupId}/postImages/`);
       onValue(imageRef, (snapshot) => {
         const data =
           snapshot.val() !== undefined &&
@@ -49,7 +51,7 @@ const PostImages = () => {
     return () => {
       setImgData([]);
     };
-  }, [groupId]);
+  }, [groupId, userId]);
 
   return (
     <>

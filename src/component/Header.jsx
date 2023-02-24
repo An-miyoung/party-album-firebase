@@ -18,7 +18,7 @@ import ProfileModal from "./modal/ProfileModal";
 function Header() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const currentUser = useRecoilValue(currentUserState);
+  const { userId, displayName, photoURL } = useRecoilValue(currentUserState);
 
   const handleOpenMenu = useCallback((event) => {
     setAnchorEl(event.currentTarget);
@@ -37,10 +37,10 @@ function Header() {
   }, []);
 
   const handleLogout = useCallback(async () => {
-    console.log(currentUser);
+    console.log("userId : ", userId);
     await signOut(auth);
-    // App.js 내부 onAuthStateChanged 함수를 이용해 로그아웃 처리를 해준다.
-  }, [currentUser]);
+    handleCloseMenu();
+  }, [handleCloseMenu, userId]);
 
   return (
     <>
@@ -66,11 +66,11 @@ function Header() {
           <Box>
             <IconButton onClick={handleOpenMenu}>
               <Typography component="div" variant="h6">
-                {currentUser && console.log("currentUser : ", currentUser)}
-                {currentUser.uid !== null ? currentUser.displayName : "guest"}
+                {userId && console.log("currentUser : ", displayName)}
+                {userId !== null ? displayName : "guest"}
               </Typography>
               <Avatar
-                src={currentUser.uid !== null ? currentUser.photoURL : null}
+                src={userId !== null ? photoURL : null}
                 sx={{ ml: "10px", bgcolor: "#dd82a4" }}
                 alt="ProfileImage"
               ></Avatar>

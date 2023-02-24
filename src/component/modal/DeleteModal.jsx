@@ -5,6 +5,7 @@ import { ref, remove } from "firebase/database";
 import { ref as refStorage, listAll, deleteObject } from "firebase/storage";
 import { imgSrcTranslator } from "../../utils/imgSrcTranslator";
 import { useRecoilValue } from "recoil";
+import { currentUserState } from "../../store/user";
 import { groupImageState } from "../../store/groupImage";
 
 const deleteToData = (action, realtimeRef, storageRef) => {
@@ -35,6 +36,7 @@ const deleteToData = (action, realtimeRef, storageRef) => {
 };
 
 export const DeleteModal = ({ open, handleClose, groupId, action }) => {
+  const { userId } = useRecoilValue(currentUserState);
   const { imageId, downloadUrl } = useRecoilValue(groupImageState);
 
   const title =
@@ -49,21 +51,21 @@ export const DeleteModal = ({ open, handleClose, groupId, action }) => {
   const groupsAllDelete = useCallback(() => {
     deleteToData(
       action,
-      ref(db, "groups/" + groupId),
-      refStorage(storage, "postImages/" + groupId)
+      ref(db, `groups/${userId}/${groupId}`),
+      refStorage(storage, `postImages/${userId}/${groupId}`)
     );
     handleClose();
-  }, [action, groupId, handleClose]);
+  }, [action, groupId, handleClose, userId]);
 
   const thisImageOnlyDelete = useCallback(() => {
     const imgSrc = imgSrcTranslator(downloadUrl);
     deleteToData(
       action,
-      ref(db, "groups/" + groupId + "/postImages/" + imageId),
+      ref(db, `groups/${userId}/${groupId}/postImages/${imageId}`),
       refStorage(storage, imgSrc)
     );
     handleClose();
-  }, [action, downloadUrl, groupId, handleClose, imageId]);
+  }, [action, downloadUrl, groupId, handleClose, imageId, userId]);
 
   return (
     <Dialog open={open} onClose={handleClose}>

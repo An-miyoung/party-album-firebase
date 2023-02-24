@@ -15,20 +15,20 @@ import { currentUserState } from "./store/user";
 
 function App() {
   const [user, setUser] = useRecoilState(currentUserState);
-  const isCurrentUser = user.uid !== null;
+  const isCurrentUser = user.userId !== null;
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!!user) {
         setUser({
-          uid: user.uid,
+          userId: user.uid,
           displayName: user.displayName,
           photoURL: user.photoURL,
         });
       } else {
         console.log("logout");
         setUser({
-          uid: null,
+          userId: null,
           displayName: "",
           photoURL: "",
         });

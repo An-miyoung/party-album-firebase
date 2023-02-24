@@ -14,7 +14,7 @@ import { auth, db } from "../firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { ref, set } from "firebase/database";
 import md5 from "md5";
-import { useRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 import { currentUserState } from "../store/user";
 
 const IsPasswordValid = (password, confirmPassword) => {
@@ -34,7 +34,7 @@ function Join() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
+  const setCurrentUser = useSetRecoilState(currentUserState);
 
   const handleNameChange = useCallback((e) => {
     setName(e.target.value);
@@ -79,7 +79,7 @@ function Join() {
 
         // displayName 과 photoUrl 이 만들어진 후 frontend  내 보관
         setCurrentUser({
-          uid: user.uid,
+          userId: user.uid,
           displayName: user.displayName,
           photoURL: user.photoURL,
         });

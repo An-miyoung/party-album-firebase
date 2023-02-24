@@ -55,17 +55,20 @@ function ProfileModal({ open, handleClose }) {
   }, []);
 
   const uploadCroppedImage = useCallback(async () => {
-    if (!currentUser.uid) return;
+    if (!currentUser.userId) return;
 
     // firebase storae 에 주소를 만들어주고
-    const storageRef = refStorage(storage, `avatars/users/${currentUser.uid}`);
+    const storageRef = refStorage(
+      storage,
+      `avatars/users/${currentUser.userId}`
+    );
     const uploadTask = await uploadBytes(storageRef, blob);
     const downloadUrl = await getDownloadURL(uploadTask.ref);
     setUploadedImage(downloadUrl);
-  }, [blob, currentUser.uid]);
+  }, [blob, currentUser.userId]);
 
   useEffect(() => {
-    if (!uploadedImage || !currentUser.uid) return;
+    if (!uploadedImage || !currentUser.userId) return;
 
     // firebase auth 의 메소드를 사용해 update
     async function changeAvatar() {
@@ -73,11 +76,11 @@ function ProfileModal({ open, handleClose }) {
 
       // firebase db 에 저장
       const updates = {};
-      updates["/users/" + currentUser.uid + "/avatar"] = uploadedImage;
+      updates["/users/" + currentUser.userId + "/avatar"] = uploadedImage;
       await update(ref(db), updates);
 
       setCurrentUser({
-        uid: currentUser.uid,
+        userId: currentUser.userId,
         displayName: currentUser.displayName,
         photoURL: uploadedImage,
       });
