@@ -19,7 +19,7 @@ import { currentUserState } from "../store/user";
 import { groupIdState } from "../store/groupId";
 import { groupNameState } from "../store/groupName";
 
-const Post = () => {
+const ShareGuest = () => {
   const { guid } = useParams();
   const { userId } = useRecoilValue(currentUserState);
   const setGroupId = useSetRecoilState(groupIdState);
@@ -43,6 +43,7 @@ const Post = () => {
       .then((snapshot) => {
         if (snapshot.exists()) {
           const { groupId, groupName, groupMembers } = snapshot.val();
+          setGroupId(guid);
           setGroupId(groupId);
           setGroupName(groupName);
           setGroupMembers(groupMembers);
@@ -245,7 +246,7 @@ const Post = () => {
   );
 };
 
-export default Post;
+export default ShareGuest;
 
 const StyleContainer = styled.div`
   padding-top: 80px;

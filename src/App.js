@@ -11,6 +11,7 @@ import Post from "./pages/Post";
 import NotFound from "./pages/NotFound";
 import { useRecoilState } from "recoil";
 import { currentUserState } from "./store/user";
+import ShareGuest from "./pages/ShareGuest";
 
 function App() {
   const [user, setUser] = useRecoilState(currentUserState);
@@ -61,6 +62,7 @@ function App() {
             isCurrentUser ? <Navigate to={ROUTES.GROUPS_LIST} /> : <Login />
           }
         />
+        <Route path={ROUTES.SHARE_GUEST} element={<ShareGuest />} />
         <Route path={ROUTES.SHOW_POST_DETAIL} element={<Post />} />
         <Route
           path={ROUTES.GROUPS_LIST}

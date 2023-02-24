@@ -68,7 +68,6 @@ const PostImages = () => {
                 alt={item.title}
                 loading="lazy"
               />
-
               <DeleteIcon
                 style={{
                   color: "white",
@@ -78,7 +77,6 @@ const PostImages = () => {
                 }}
                 onClick={() => handleDelete(item.imageId, item.img)}
               />
-
               <ImageListItemBar
                 title={item.title}
                 key={`${item}-${idx}`}
@@ -129,6 +127,7 @@ const PostImages = () => {
           ))}
         </ImageList>
       )}
+
       <DeleteModal
         open={showDeleteModal}
         handleClose={handleShowDeleteModal}
