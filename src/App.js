@@ -10,31 +10,59 @@ import GroupsList from "./pages/GroupsList";
 import Post from "./pages/Post";
 import NotFound from "./pages/NotFound";
 import TestJoin from "./pages/TestJoin";
-// import { useRecoilState } from "recoil";
-// import { currentUserState } from "./store/user";
+import { useRecoilState } from "recoil";
+import { currentUserState } from "./store/user";
 
 function App() {
-  // const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
+  const [user, setUser] = useRecoilState(currentUserState);
+  const isCurrentUser = user.uid !== null;
 
-  // useEffect(() => {
-  //   const unsubscribe = onAuthStateChanged(auth, (user) => {
-  //     if (!!user) {
-  //       setCurrentUser(user);
-  //     } else {
-  //       console.log("logout");
-  //       setCurrentUser({});
-  //     }
-  //   });
-  //   return () => unsubscribe();
-  // }, [setCurrentUser]);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!!user) {
+        setUser({
+          uid: user.uid,
+          displayName: user.displayName,
+          photoURL: user.photoURL,
+        });
+      } else {
+        console.log("logout");
+        setUser({
+          uid: null,
+          displayName: "",
+          photoURL: "",
+        });
+      }
+    });
+    return () => unsubscribe();
+  }, [isCurrentUser, setUser]);
 
   return (
     <div>
       <Routes>
-        <Route path="/" element={<Navigate to={ROUTES.JOIN} />} />
+        <Route
+          path="/"
+          element={
+            isCurrentUser ? (
+              <Navigate to={ROUTES.GROUPS_LIST} />
+            ) : (
+              <Navigate to={ROUTES.LOGIN} />
+            )
+          }
+        />
         <Route path="/testJoin" element={<TestJoin />} />
-        <Route path={ROUTES.JOIN} element={<Join />} />
-        <Route path={ROUTES.LOGIN} element={<Login />} />
+        <Route
+          path={ROUTES.JOIN}
+          element={
+            isCurrentUser ? <Navigate to={ROUTES.GROUPS_LIST} /> : <Join />
+          }
+        />
+        <Route
+          path={ROUTES.LOGIN}
+          element={
+            isCurrentUser ? <Navigate to={ROUTES.GROUPS_LIST} /> : <Login />
+          }
+        />
         <Route path={ROUTES.SHOW_POST_DETAIL} element={<Post />} />
         <Route path={ROUTES.GROUPS_LIST} element={<GroupsList />} />
         <Route path="/*" element={<NotFound />} />

@@ -64,11 +64,9 @@ function Join() {
         );
         await updateProfile(user, {
           displayName: name,
-          photoURL: `https://www.gravatar.com/avatar/${md5(email)}?d=retro`,
+          photoURL: `https://www.gravatar.com/avatar/${md5(email)}?d=wavatar`,
         });
         console.log(user);
-        // displayName 과 photoUrl 이 만들어진 후 frontend  내 보관
-        setCurrentUser({ uid: user.uid });
 
         // email, password 는 auth 에서 관리
         // displayName, photoUrl 은 userProfile 에서 관리
@@ -78,6 +76,13 @@ function Join() {
           avatar: user.photoURL,
         });
         setLoading(false);
+
+        // displayName 과 photoUrl 이 만들어진 후 frontend  내 보관
+        setCurrentUser({
+          uid: user.uid,
+          displayName: user.displayName,
+          photoURL: user.photoURL,
+        });
       } catch (error) {
         setError(error.message);
         setLoading(false);

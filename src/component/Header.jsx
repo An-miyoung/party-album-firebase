@@ -64,9 +64,11 @@ function Header() {
           <Box>
             <IconButton onClick={handleOpenMenu}>
               <Typography component="div" variant="h6">
-                미영
+                {currentUser && console.log("currentUser : ", currentUser)}
+                {currentUser.uid !== null ? currentUser.displayName : "guest"}
               </Typography>
               <Avatar
+                src={currentUser.uid !== null ? currentUser.photoURL : null}
                 sx={{ ml: "10px", bgcolor: "#dd82a4" }}
                 alt="ProfileImage"
               ></Avatar>
