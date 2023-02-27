@@ -1,6 +1,6 @@
 # 모임별 사진을 저장하고 모임멤버들과 그 사진첩을 공유.
 
-<img width="1080" alt="스크린샷 2022-03-21 오후 7 46 59" src="https://user-images.githubusercontent.com/61385080/159249056-82600e42-623f-42ca-9ba1-da3d3c1bb62c.png">
+![스크린샷 2023-02-27 오후 4 45 36](https://user-images.githubusercontent.com/61385080/221504261-12d42936-73db-4422-9f5b-9507f5d1bdbd.png)
 
 사진에 짧은 코멘트를 달아 각종 모임별로 저장하고 모임멤버들과 공유하는 SPA 프로젝트입니다.
 
