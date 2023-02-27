@@ -15,6 +15,10 @@
       "$uid": {
         ".write": "auth !=null && auth.uid === $uid"
       }
+    },
+    "shared": {
+      ".read": true,
+      ".write": true
     }
   }
 }

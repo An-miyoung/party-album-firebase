@@ -14,6 +14,8 @@ import { signOut } from "firebase/auth";
 import { useRecoilValue } from "recoil";
 import { currentUserState } from "../store/user";
 import ProfileModal from "./modal/ProfileModal";
+import { Link } from "react-router-dom";
+import { ROUTES } from "../routes";
 
 function Header() {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -37,10 +39,9 @@ function Header() {
   }, []);
 
   const handleLogout = useCallback(async () => {
-    console.log("userId : ", userId);
     await signOut(auth);
     handleCloseMenu();
-  }, [handleCloseMenu, userId]);
+  }, [handleCloseMenu]);
 
   return (
     <>
@@ -66,7 +67,6 @@ function Header() {
           <Box>
             <IconButton onClick={handleOpenMenu}>
               <Typography component="div" variant="h6">
-                {userId && console.log("currentUser : ", displayName)}
                 {userId !== null ? displayName : "guest"}
               </Typography>
               <Avatar
@@ -75,20 +75,53 @@ function Header() {
                 alt="ProfileImage"
               ></Avatar>
             </IconButton>
-            <Menu
-              sx={{ mt: "45px" }}
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClose={handleCloseMenu}
-              anchorOrigin={{ vertical: "top", horizontal: "right" }}
-            >
-              <MenuItem onClick={handleProfileModalOpen}>
-                <Typography textAlign="center">프로필이미지</Typography>
-              </MenuItem>
-              <MenuItem onClick={handleLogout}>
-                <Typography textAlign="center">Logout</Typography>
-              </MenuItem>
-            </Menu>
+            {userId !== null && (
+              <Menu
+                sx={{ mt: "45px" }}
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleCloseMenu}
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
+              >
+                <MenuItem onClick={handleProfileModalOpen}>
+                  <Typography textAlign="center">프로필이미지</Typography>
+                </MenuItem>
+                <MenuItem onClick={handleLogout}>
+                  <Typography textAlign="center">Logout</Typography>
+                </MenuItem>
+              </Menu>
+            )}
+            {userId == null && (
+              <Menu
+                Menu
+                sx={{ mt: "45px" }}
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleCloseMenu}
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
+              >
+                <MenuItem>
+                  <Typography textAlign="center">
+                    <Link
+                      to={ROUTES.LOGIN}
+                      style={{ textDecoration: "none", color: "black" }}
+                    >
+                      로그인
+                    </Link>
+                  </Typography>
+                </MenuItem>
+                <MenuItem>
+                  <Typography textAlign="center">
+                    <Link
+                      to={ROUTES.JOIN}
+                      style={{ textDecoration: "none", color: "black" }}
+                    >
+                      회원가입
+                    </Link>
+                  </Typography>
+                </MenuItem>
+              </Menu>
+            )}
           </Box>
         </Toolbar>
       </AppBar>

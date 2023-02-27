@@ -1,13 +1,21 @@
 import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useRecoilValue, useSetRecoilState, useRecoilState } from "recoil";
 import { db } from "../firebase";
-import { child, get, ref, update } from "firebase/database";
+import {
+  child,
+  get,
+  ref,
+  update,
+  set,
+  serverTimestamp,
+} from "firebase/database";
 import { Box, Button, Menu, MenuItem, Typography } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { ROUTE_UTILS } from "../routes";
 import { groupDataPicker } from "../store/groupData";
 import { groupMembersState } from "../store/groupMembers";
 import Header from "../component/Header";
@@ -90,6 +98,17 @@ const Post = () => {
   const handleCloseMenu = useCallback(() => {
     setAnchorEl(null);
   }, []);
+
+  // 그룹공유
+  const handleSharedGroup = () => {
+    set(ref(db, `shared/${guid}`), {
+      timestamp: serverTimestamp(),
+      groupId: guid,
+      groupName,
+      groupMembers,
+      postImages: pickedGroupData[0].postImages,
+    });
+  };
 
   // 멤버 입력
   const handleGroupmemebrsModalClose = useCallback(() => {
@@ -210,6 +229,16 @@ const Post = () => {
           onClose={handleCloseMenu}
           anchorOrigin={{ vertical: "top", horizontal: "right" }}
         >
+          <MenuItem onClick={handleSharedGroup}>
+            <Typography textAlign="center">
+              <Link
+                to={ROUTE_UTILS.SHARE_GUEST(guid)}
+                style={{ textDecoration: "none", color: "black" }}
+              >
+                모임공유
+              </Link>
+            </Typography>
+          </MenuItem>
           <MenuItem onClick={handleShowGroupMembersModal}>
             <Typography textAlign="center">멤버추가</Typography>
           </MenuItem>

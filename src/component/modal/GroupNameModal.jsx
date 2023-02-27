@@ -15,8 +15,7 @@ import { currentUserState } from "../../store/user";
 import { groupNameState } from "../../store/groupName";
 
 const GroupNameModal = ({ open, handleClose, action, guid }) => {
-  const { userId, displayName } = useRecoilValue(currentUserState);
-  console.log(userId, "/", displayName);
+  const { userId } = useRecoilValue(currentUserState);
   const [groupName, setGroupName] = useRecoilState(groupNameState);
   const title =
     action === "createName"

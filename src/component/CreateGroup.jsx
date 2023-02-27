@@ -60,7 +60,6 @@ const StyleButtonLocation = styled.div`
 `;
 
 const StyleButton = styled.button`
-  /* width: 60%; */
   height: 8vh;
   margin: 0 auto;
   padding: 0 10px;

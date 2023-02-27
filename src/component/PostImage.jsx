@@ -38,6 +38,7 @@ const PostImages = () => {
 
     const getImages = () => {
       const imageRef = ref(db, `groups/${userId}/${groupId}/postImages/`);
+
       onValue(imageRef, (snapshot) => {
         const data =
           snapshot.val() !== undefined &&
@@ -68,6 +69,7 @@ const PostImages = () => {
                 alt={item.title}
                 loading="lazy"
               />
+
               <DeleteIcon
                 style={{
                   color: "white",
@@ -77,6 +79,7 @@ const PostImages = () => {
                 }}
                 onClick={() => handleDelete(item.imageId, item.img)}
               />
+
               <ImageListItemBar
                 title={item.title}
                 key={`${item}-${idx}`}

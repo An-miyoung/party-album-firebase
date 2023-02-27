@@ -8,9 +8,10 @@ import { useRecoilValue } from "recoil";
 import { currentUserState } from "../../store/user";
 import { groupImageState } from "../../store/groupImage";
 
-const deleteToData = (action, realtimeRef, storageRef) => {
+const deleteToData = (action, realtimeRef, sharedRef, storageRef) => {
   remove(realtimeRef)
     .then(() => {
+      remove(sharedRef);
       action === "groupsAll" &&
         // 앨범전체를 삭제할 경우, storage 내부를 재귀하며 이미지 파일 삭제
         listAll(storageRef)
@@ -52,6 +53,7 @@ export const DeleteModal = ({ open, handleClose, groupId, action }) => {
     deleteToData(
       action,
       ref(db, `groups/${userId}/${groupId}`),
+      ref(db, `shared/${groupId}`),
       refStorage(storage, `postImages/${userId}/${groupId}`)
     );
     handleClose();
@@ -62,6 +64,7 @@ export const DeleteModal = ({ open, handleClose, groupId, action }) => {
     deleteToData(
       action,
       ref(db, `groups/${userId}/${groupId}/postImages/${imageId}`),
+      ref(db, `shared/${groupId}/postImages/${imageId}`),
       refStorage(storage, imgSrc)
     );
     handleClose();

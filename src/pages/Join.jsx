@@ -66,7 +66,6 @@ function Join() {
           displayName: name,
           photoURL: `https://www.gravatar.com/avatar/${md5(email)}?d=wavatar`,
         });
-        console.log(user);
 
         // email, password 는 auth 에서 관리
         // displayName, photoUrl 은 userProfile 에서 관리
